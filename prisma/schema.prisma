@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Category {
+  ROMANCE
+  FANTASY
+  DAILY
+  THRILLER
+  FEATURE
+}
+
+model User {
+  uid       Int      @id @default(autoincrement())
+  id        String   @unique
+  pwd       String
+  nickname  String   @unique
+  novels    Novel[]
+  novel_likes Novel_Like[]
+  comment   Comment[]
+}
+
+model Novel {
+  uid       Int      @id @default(autoincrement())
+  user      User     @relation(fields: [user_uid], references: [uid])
+  user_uid  Int    
+  title     String
+  content   String   @db.VarChar(3000)
+  thumbnail String   
+  category  Category
+  views     Int
+  novel_likes Novel_Like[]
+  comment Comment[]
+}
+
+model Novel_Like {
+  user      User    @relation(fields: [user_uid], references: [uid])
+  user_uid  Int    
+  novel     Novel   @relation(fields: [novel_uid], references: [uid])
+  novel_uid Int
+  @@id([user_uid, novel_uid])
+}
+
+model Comment {
+  uid       Int     @id @default(autoincrement())
+  novel     Novel   @relation(fields: [novel_uid], references: [uid])
+  novel_uid Int
+  user      User    @relation(fields: [user_uid], references: [uid])
+  user_uid  Int
+  review    String  
+}
