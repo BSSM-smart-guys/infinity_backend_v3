@@ -1,11 +1,30 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { PrismaClient } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 
+const prisma = new PrismaClient();
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  saltrounds = 10;
+
+  async create(createUserDto: CreateUserDto) {
+    const { id, nickname } = createUserDto;
+
+    const duplicate = await prisma.user.findMany({
+      where: { OR: [{ id }, { nickname }] },
+    });
+    console.log(duplicate.length, duplicate);
+    if (duplicate.length != 0) throw new ConflictException();
+
+    const pwd = await bcrypt.hash(createUserDto.pwd, this.saltrounds);
+
+    await prisma.user.create({
+      data: { id, pwd, nickname },
+    });
+
+    return createUserDto;
   }
 
   findAll() {
