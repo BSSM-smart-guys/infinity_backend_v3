@@ -14,10 +14,14 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user-dto';
+import { AuthService } from '@/auth/auth.service';
 
 @Controller('api/user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly authService: AuthService,
+  ) {}
 
   @Post('/signup')
   create(@Body() createUserDto: CreateUserDto) {
@@ -28,8 +32,10 @@ export class UserController {
   @Post('/login')
   async login(@Body() loginUserDto: LoginUserDto) {
     const authorize = await this.userService.login(loginUserDto);
-    console.log(authorize);
-    return authorize;
+    const token = this.authService.getJwtToken(authorize);
+
+    console.log(token);
+    return { token };
   }
   @Get()
   findAll() {

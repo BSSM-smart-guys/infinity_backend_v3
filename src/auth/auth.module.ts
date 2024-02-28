@@ -3,15 +3,13 @@ dotenv.config();
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserModule } from '../user/user.module';
-import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UserService } from '@/user/user.service';
 
 @Module({
   imports: [
-    UserModule,
     ConfigModule,
+    UserModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -23,6 +21,6 @@ import { UserService } from '@/user/user.service';
       }),
     }),
   ],
-  providers: [AuthService, UserService],
+  providers: [AuthService],
 })
 export class AuthModule {}

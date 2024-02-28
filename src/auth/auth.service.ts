@@ -6,7 +6,7 @@ import { UserService } from 'src/user/user.service';
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    //private readonly userService: UserService,
+    private readonly userService: UserService,
   ) {}
 
   public getJwtToken(uid: number) {

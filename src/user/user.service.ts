@@ -16,10 +16,7 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class UserService {
-  constructor(
-    private readonly jwtService: JwtService,
-    private readonly authService: AuthService,
-  ) {}
+  // constructor(private readonly authService: AuthService) {}
 
   async create(createUserDto: CreateUserDto) {
     const { id, nickname } = createUserDto;
@@ -48,8 +45,7 @@ export class UserService {
 
     if (pwdCompare) {
       const payload = { id: userInfo[0].id, nickname: userInfo[0].nickname };
-      const token = this.authService.getJwtToken(userInfo[0].uid);
-      return { token };
+      return userInfo[0].uid;
     }
     throw new UnauthorizedException();
   }
