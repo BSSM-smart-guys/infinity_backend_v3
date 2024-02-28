@@ -6,6 +6,9 @@ import {
   Patch,
   Param,
   Delete,
+  Res,
+  HttpStatus,
+  HttpCode,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -21,9 +24,12 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
+  @HttpCode(200)
   @Post('/login')
-  login(@Body() loginUserDto: LoginUserDto) {
-    return this.userService.login(loginUserDto);
+  async login(@Body() loginUserDto: LoginUserDto) {
+    const authorize = await this.userService.login(loginUserDto);
+    console.log(authorize);
+    return authorize;
   }
   @Get()
   findAll() {
