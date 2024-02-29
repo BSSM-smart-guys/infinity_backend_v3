@@ -1,11 +1,39 @@
 import { Injectable } from '@nestjs/common';
-import { CreateNovelDto } from '@/novel/dto';
+import { CreateNovelDto, PaginationMetaDto } from '@/novel/dto';
 import { Novel, PrismaClient } from '@prisma/client';
+import { ViewType } from '@/novel/enums';
+import { NovelPaginationService } from '@/novel/novel.pagination.service';
 
 const prisma = new PrismaClient();
 
 @Injectable()
 export class NovelService {
+  constructor(
+    private readonly novelPaginationService: NovelPaginationService,
+  ) {}
+
+  async findByCategory(
+    viewType: ViewType,
+    index: number,
+    size: number,
+  ): Promise<{ data: Novel[]; meta: PaginationMetaDto }> {
+    let condition;
+    if (viewType === ViewType.LATEST) {
+      condition = { uid: 'desc' };
+    } else if (viewType === ViewType.POPULAR) {
+      condition = [{ views: 'desc' }, { uid: 'desc' }];
+    }
+
+    return {
+      data: await prisma.novel.findMany({
+        orderBy: condition,
+        skip: (index - 1) * size,
+        take: size,
+      }),
+      meta: await this.novelPaginationService.getMetadata(index, size),
+    };
+  }
+
   async findById(id: number): Promise<Novel> {
     const novel = await prisma.novel.findUnique({
       where: {

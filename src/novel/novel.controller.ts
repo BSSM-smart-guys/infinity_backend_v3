@@ -6,14 +6,26 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
 } from '@nestjs/common';
 import { NovelService } from './novel.service';
-import { CreateNovelDto } from '@/novel/dto';
+import {
+  CreateNovelDto,
+  FindNovelFeedDto,
+  FindNovelListCategoryDto,
+} from '@/novel/dto';
 import { Novel } from '@prisma/client';
 
 @Controller('novel')
 export class NovelController {
   constructor(private readonly novelService: NovelService) {}
+
+  @Get()
+  findByCategory(
+    @Query() { viewType, index, size }: FindNovelListCategoryDto,
+  ): Promise<FindNovelFeedDto> {
+    return this.novelService.findByCategory(viewType, index, size);
+  }
 
   @Get(':id')
   findById(@Param('id', new ParseIntPipe()) id: number): Promise<Novel> {
