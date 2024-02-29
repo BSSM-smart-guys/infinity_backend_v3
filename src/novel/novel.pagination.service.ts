@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import PaginationMetaDto from '@/novel/dto/pagination.meta.dto';
+import { PaginationMetaDto } from '@/novel/dto';
 
 const prisma = new PrismaClient();
 

@@ -1,5 +1,5 @@
 import { Novel } from '@prisma/client';
-import { PaginationMetaDto } from '@/novel/dto/index';
+import { PaginationMetaDto } from '@/novel/dto';
 
 interface FindNovelFeedDto {
   data: Novel[];
