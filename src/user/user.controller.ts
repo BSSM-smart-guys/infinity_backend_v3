@@ -44,13 +44,13 @@ export class UserController {
     return this.userService.findOne(+uid);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) { // 프론트랑 상의 후 개발
+  //   return this.userService.update(+id, updateUserDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {   // 프론트랑 상의 후 개발
+  //   return this.userService.remove(+id);
+  // }
 }
