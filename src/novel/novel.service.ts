@@ -23,7 +23,12 @@ export class NovelService {
     });
   }
 
-  async createNovel({ title, content, thumbnail, category }: CreateNovelDto) {
+  async createNovel({
+    title,
+    content,
+    thumbnail,
+    category,
+  }: CreateNovelDto): Promise<number> {
     return (
       await prisma.novel.create({
         data: {

@@ -22,7 +22,7 @@ export class NovelController {
 
   @Post()
   @HttpCode(201)
-  createNovel(@Body() createNovelDto: CreateNovelDto) {
+  createNovel(@Body() createNovelDto: CreateNovelDto): Promise<number> {
     return this.novelService.createNovel(createNovelDto);
   }
 }
