@@ -9,8 +9,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from './dto/login-user-dto';
-import { JwtService } from '@nestjs/jwt';
-import { AuthService } from '@/auth/auth.service';
 
 const prisma = new PrismaClient();
 
@@ -50,12 +48,11 @@ export class UserService {
     throw new UnauthorizedException();
   }
 
-  findAll() {
-    return `This action returns all user`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(uid: number) {
+    return await prisma.user.findUnique({
+      select: { id: true, nickname: true },
+      where: { uid },
+    });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

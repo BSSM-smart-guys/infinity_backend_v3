@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { TokenPayload } from './tokenPayload.interface';
 import { UserService } from 'src/user/user.service';
@@ -19,11 +19,11 @@ export class AuthService {
     return token;
   }
 
-  // async validateUser(payload: any) {
-  //   const user = await this.userService.findOne(payload.userUniqueId);
-  //   if (user) {
-  //     return user;
-  //   }
-  //   return null;
-  // }
+  validateUser(payload: any) {
+    const user = this.userService.findOne(payload.uid);
+    if (user) {
+      return user;
+    }
+    throw new NotFoundException();
+  }
 }

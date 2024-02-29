@@ -9,6 +9,7 @@ import {
   Res,
   HttpStatus,
   HttpCode,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -37,14 +38,10 @@ export class UserController {
     console.log(token);
     return { token };
   }
-  @Get()
-  findAll() {
-    return this.userService.findAll();
-  }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  @Get(':uid')
+  findOne(@Param('uid') uid: string) {
+    return this.userService.findOne(+uid);
   }
 
   @Patch(':id')
