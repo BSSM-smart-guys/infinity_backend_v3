@@ -29,7 +29,9 @@ export class NovelController {
   }
 
   @Get('category')
-  findByCategory(@Query() { category, index, size }: FindNovelListCategoryDto) {
+  findByCategory(
+    @Query() { category, index, size }: FindNovelListCategoryDto,
+  ): Promise<FindNovelListDto> {
     return this.novelService.findByCategory(category, index, size);
   }
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateNovelDto, PaginationMetaDto } from '@/novel/dto';
+import { CreateNovelDto, FindNovelListDto, PaginationMetaDto } from '@/novel/dto';
 import { Novel, PrismaClient } from '@prisma/client';
 import { Category, ViewType } from '@/novel/enums';
 import { NovelPaginationService } from '@/novel/novel.pagination.service';
@@ -16,7 +16,7 @@ export class NovelService {
     viewType: ViewType,
     index: number,
     size: number,
-  ): Promise<{ data: Novel[]; meta: PaginationMetaDto }> {
+  ): Promise<FindNovelListDto> {
     let condition;
     if (viewType === ViewType.LATEST) {
       condition = { uid: 'desc' };
@@ -34,7 +34,11 @@ export class NovelService {
     };
   }
 
-  async findByCategory(category: Category, index: number, size: number) {
+  async findByCategory(
+    category: Category,
+    index: number,
+    size: number,
+  ): Promise<FindNovelListDto> {
     return {
       data: await prisma.novel.findMany({
         where: {
