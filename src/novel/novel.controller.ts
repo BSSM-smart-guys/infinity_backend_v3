@@ -11,7 +11,7 @@ import {
 import { NovelService } from './novel.service';
 import {
   CreateNovelDto,
-  FindNovelFeedDto,
+  FindNovelListDto,
   FindNovelListCategoryDto,
   FindNovelListViewTypeDto,
 } from '@/novel/dto';
@@ -24,7 +24,7 @@ export class NovelController {
   @Get()
   findByViewType(
     @Query() { viewType, index, size }: FindNovelListViewTypeDto,
-  ): Promise<FindNovelFeedDto> {
+  ): Promise<FindNovelListDto> {
     return this.novelService.findByViewType(viewType, index, size);
   }
 

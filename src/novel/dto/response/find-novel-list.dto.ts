@@ -1,9 +1,9 @@
 import { Novel } from '@prisma/client';
 import { PaginationMetaDto } from '@/novel/dto';
 
-interface FindNovelFeedDto {
+interface FindNovelListDto {
   data: Novel[];
   meta: PaginationMetaDto;
 }
 
-export default FindNovelFeedDto;
+export default FindNovelListDto;
