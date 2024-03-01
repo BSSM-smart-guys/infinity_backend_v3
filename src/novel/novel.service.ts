@@ -12,7 +12,7 @@ export class NovelService {
     private readonly novelPaginationService: NovelPaginationService,
   ) {}
 
-  async findByCategory(
+  async findByViewType(
     viewType: ViewType,
     index: number,
     size: number,

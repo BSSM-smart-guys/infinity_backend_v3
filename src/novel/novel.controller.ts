@@ -12,7 +12,7 @@ import { NovelService } from './novel.service';
 import {
   CreateNovelDto,
   FindNovelFeedDto,
-  FindNovelListCategoryDto,
+  FindNovelListViewTypeDto,
 } from '@/novel/dto';
 import { Novel } from '@prisma/client';
 
@@ -21,10 +21,10 @@ export class NovelController {
   constructor(private readonly novelService: NovelService) {}
 
   @Get()
-  findByCategory(
-    @Query() { viewType, index, size }: FindNovelListCategoryDto,
+  findByViewType(
+    @Query() { viewType, index, size }: FindNovelListViewTypeDto,
   ): Promise<FindNovelFeedDto> {
-    return this.novelService.findByCategory(viewType, index, size);
+    return this.novelService.findByViewType(viewType, index, size);
   }
 
   @Get(':id')

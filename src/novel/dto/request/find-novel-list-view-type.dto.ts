@@ -1,11 +1,11 @@
+import { ViewType } from '@/novel/enums';
 import { IsEnum, IsInt, IsNotEmpty } from 'class-validator';
-import { Category } from '@/novel/enums';
 import { Type } from 'class-transformer';
 
-class FindNovelListCategoryDto {
+class FindNovelListViewTypeDto {
   @IsNotEmpty()
-  @IsEnum(Category)
-  category: Category;
+  @IsEnum(ViewType)
+  viewType: ViewType;
 
   @Type(() => Number)
   @IsNotEmpty()
@@ -18,4 +18,4 @@ class FindNovelListCategoryDto {
   size: number;
 }
 
-export default FindNovelListCategoryDto;
+export default FindNovelListViewTypeDto;
