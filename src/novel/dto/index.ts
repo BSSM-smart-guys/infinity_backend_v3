@@ -3,3 +3,4 @@ export { default as FindNovelListViewTypeDto } from './request/find-novel-list-v
 export { default as PaginationMetaDto } from './response/pagination.meta.dto';
 export { default as FindNovelListDto } from './response/find-novel-list.dto';
 export { default as FindNovelListCategoryDto } from './request/find-novel-list-category.dto';
+export { default as SearchNovelListDto } from './request/search-novel-list.dto';

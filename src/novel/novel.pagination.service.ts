@@ -11,14 +11,18 @@ export class NovelPaginationService {
     index: number,
     size: number,
     category?: Category,
+    query?: string,
   ): Promise<PaginationMetaDto> {
-    const total: number = await prisma.novel.count(
-      category && {
-        where: {
-          category,
-        },
+    const total: number = await prisma.novel.count({
+      where: {
+        ...(category && { category }),
+        ...(query && {
+          title: {
+            contains: query,
+          },
+        }),
       },
-    );
+    });
     const lastPage: number = Math.ceil(total / size);
 
     return {

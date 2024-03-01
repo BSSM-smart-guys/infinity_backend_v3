@@ -14,6 +14,7 @@ import {
   FindNovelListDto,
   FindNovelListCategoryDto,
   FindNovelListViewTypeDto,
+  SearchNovelListDto,
 } from '@/novel/dto';
 import { Novel } from '@prisma/client';
 
@@ -33,6 +34,13 @@ export class NovelController {
     @Query() { category, index, size }: FindNovelListCategoryDto,
   ): Promise<FindNovelListDto> {
     return this.novelService.findByCategory(category, index, size);
+  }
+
+  @Get('search')
+  searchNovelList(
+    @Query() { query, index, size, viewType }: SearchNovelListDto,
+  ): Promise<FindNovelListDto> {
+    return this.novelService.searchNovel(query, index, size, viewType);
   }
 
   @Get(':id')

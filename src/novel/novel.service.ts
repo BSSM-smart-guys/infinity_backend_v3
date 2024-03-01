@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateNovelDto, FindNovelListDto, PaginationMetaDto } from '@/novel/dto';
+import { CreateNovelDto, FindNovelListDto } from '@/novel/dto';
 import { Novel, PrismaClient } from '@prisma/client';
 import { Category, ViewType } from '@/novel/enums';
 import { NovelPaginationService } from '@/novel/novel.pagination.service';
@@ -17,16 +17,9 @@ export class NovelService {
     index: number,
     size: number,
   ): Promise<FindNovelListDto> {
-    let condition;
-    if (viewType === ViewType.LATEST) {
-      condition = { uid: 'desc' };
-    } else if (viewType === ViewType.POPULAR) {
-      condition = [{ views: 'desc' }, { uid: 'desc' }];
-    }
-
     return {
       data: await prisma.novel.findMany({
-        orderBy: condition,
+        orderBy: this.orderByViewType(viewType),
         skip: (index - 1) * size,
         take: size,
       }),
@@ -51,6 +44,30 @@ export class NovelService {
         index,
         size,
         category,
+      ),
+    };
+  }
+
+  async searchNovel(
+    query: string,
+    index: number,
+    size: number,
+    viewType: ViewType,
+  ): Promise<FindNovelListDto> {
+    return {
+      data: await prisma.novel.findMany({
+        where: {
+          title: {
+            contains: query,
+          },
+        },
+        orderBy: this.orderByViewType(viewType),
+      }),
+      meta: await this.novelPaginationService.getMetadata(
+        index,
+        size,
+        null,
+        query,
       ),
     };
   }
@@ -90,5 +107,13 @@ export class NovelService {
         },
       })
     ).uid;
+  }
+
+  private orderByViewType(viewType: ViewType): any {
+    if (viewType === ViewType.LATEST) {
+      return { uid: 'desc' };
+    } else if (viewType === ViewType.POPULAR) {
+      return [{ views: 'desc' }, { uid: 'desc' }];
+    }
   }
 }
