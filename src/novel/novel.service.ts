@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateNovelDto, PaginationMetaDto } from '@/novel/dto';
 import { Novel, PrismaClient } from '@prisma/client';
-import { ViewType } from '@/novel/enums';
+import { Category, ViewType } from '@/novel/enums';
 import { NovelPaginationService } from '@/novel/novel.pagination.service';
 
 const prisma = new PrismaClient();
@@ -31,6 +31,23 @@ export class NovelService {
         take: size,
       }),
       meta: await this.novelPaginationService.getMetadata(index, size),
+    };
+  }
+
+  async findByCategory(category: Category, index: number, size: number) {
+    return {
+      data: await prisma.novel.findMany({
+        where: {
+          category,
+        },
+        skip: (index - 1) * size,
+        take: size,
+      }),
+      meta: await this.novelPaginationService.getMetadata(
+        index,
+        size,
+        category,
+      ),
     };
   }
 
