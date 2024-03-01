@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Param,
@@ -52,5 +53,11 @@ export class NovelController {
   @HttpCode(201)
   createNovel(@Body() createNovelDto: CreateNovelDto): Promise<number> {
     return this.novelService.createNovel(createNovelDto);
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  deleteNovel(@Param('id', new ParseIntPipe()) id: number): Promise<void> {
+    return this.novelService.deleteNovel(id);
   }
 }

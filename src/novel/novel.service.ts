@@ -109,6 +109,14 @@ export class NovelService {
     ).uid;
   }
 
+  async deleteNovel(id: number): Promise<void> {
+    await prisma.novel.delete({
+      where: {
+        uid: id,
+      },
+    });
+  }
+
   private orderByViewType(viewType: ViewType): any {
     if (viewType === ViewType.LATEST) {
       return { uid: 'desc' };
