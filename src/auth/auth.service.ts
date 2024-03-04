@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { TokenPayload } from './tokenPayload.interface';
 import { UserService } from 'src/user/user.service';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -15,7 +16,6 @@ export class AuthService {
       expiresIn: '12h',
       secret: process.env.SECRET_KEY,
     });
-    console.log(1);
     return token;
   }
 
