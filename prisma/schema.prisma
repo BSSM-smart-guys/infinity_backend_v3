@@ -36,7 +36,7 @@ model Novel {
   user      User     @relation(fields: [user_uid], references: [uid])
   user_uid  Int    
   title     String
-  content   String   @db.VarChar(3000)
+  content   String   @db.Text
   thumbnail String   
   category  Category
   views     Int
