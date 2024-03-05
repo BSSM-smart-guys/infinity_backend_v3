@@ -14,10 +14,7 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly jwtService: JwtService,
-    private readonly userService: UserService,
-  ) {}
+  constructor(private readonly jwtService: JwtService) {}
 
   public getJwtToken(uid: number) {
     const payload: TokenPayload = { uid };
@@ -26,15 +23,5 @@ export class AuthService {
       secret: process.env.SECRET_KEY,
     });
     return token;
-  }
-
-  async validateUser(token: any) {
-    console.log(token.uid);
-    const userInfo = await prisma.user.findUnique({
-      select: { id: true },
-      where: { uid: token.uid },
-    });
-    if (!userInfo) throw new UnauthorizedException();
-    return userInfo;
   }
 }

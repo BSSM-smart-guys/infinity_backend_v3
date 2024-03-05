@@ -39,8 +39,7 @@ export class UserService {
   async login(loginUserDto: LoginUserDto) {
     const { id, pwd } = loginUserDto;
     const userInfo = await prisma.user.findMany({ where: { id } });
-    if (!userInfo) throw new NotFoundException();
-
+    if (userInfo.length == 0) throw new NotFoundException();
     const pwdCompare = await bcrypt.compare(pwd, userInfo[0].pwd);
 
     if (pwdCompare) {
