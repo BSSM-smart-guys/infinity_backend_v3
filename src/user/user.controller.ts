@@ -1,8 +1,22 @@
-import { Controller, Get, Post, Body, Param, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  HttpCode,
+  Put,
+  Headers,
+  UseGuards,
+  Res,
+  HttpStatus,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user-dto';
 import { AuthService } from '@/auth/auth.service';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('api/user')
 export class UserController {
@@ -22,7 +36,6 @@ export class UserController {
     const authorize = await this.userService.login(loginUserDto);
     const token = this.authService.getJwtToken(authorize);
 
-    console.log(token);
     return { token };
   }
 
@@ -31,10 +44,16 @@ export class UserController {
     return this.userService.findOne(+uid);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) { // 프론트랑 상의 후 개발
-  //   return this.userService.update(+id, updateUserDto);
-  // }
+  @Put(':uid')
+  @UseGuards(AuthGuard('jwt'))
+  update(
+    @Param('uid') uid: string,
+    @Headers('Authorization') authorizationHeader: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    this.userService.update(+uid, updateUserDto);
+    return HttpStatus.OK;
+  }
 
   // @Delete(':id')
   // remove(@Param('id') id: string) {   // 프론트랑 상의 후 개발
