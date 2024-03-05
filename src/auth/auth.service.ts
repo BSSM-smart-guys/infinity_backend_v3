@@ -1,7 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import * as dotenv from 'dotenv';
+dotenv.config();
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { TokenPayload } from './tokenPayload.interface';
 import { UserService } from 'src/user/user.service';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 @Injectable()
 export class AuthService {
@@ -19,11 +28,13 @@ export class AuthService {
     return token;
   }
 
-  validateUser(payload: any) {
-    const user = this.userService.findOne(payload.uid);
-    if (user) {
-      return user;
-    }
-    throw new NotFoundException();
+  async validateUser(token: any) {
+    console.log(token.uid);
+    const userInfo = await prisma.user.findUnique({
+      select: { id: true },
+      where: { uid: token.uid },
+    });
+    if (!userInfo) throw new UnauthorizedException();
+    return userInfo;
   }
 }
