@@ -10,6 +10,7 @@ import {
   UseGuards,
   Res,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -44,13 +45,14 @@ export class UserController {
     return this.userService.findOne(+uid);
   }
 
+  @Get('/')
+  findByJWT(@Headers('Authorization') token: string) {
+    const [Bearer, JWT] = token.split(' ');
+    return this.authService.validateToken(JWT);
+  }
   @Put(':uid')
   @UseGuards(AuthGuard('jwt'))
-  update(
-    @Param('uid') uid: string,
-    @Headers('Authorization') authorizationHeader: string,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
+  update(@Param('uid') uid: string, @Body() updateUserDto: UpdateUserDto) {
     this.userService.update(+uid, updateUserDto);
     return HttpStatus.OK;
   }
