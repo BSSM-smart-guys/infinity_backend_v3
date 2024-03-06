@@ -32,10 +32,10 @@ export class AuthService {
         secret: process.env.SECRET_KEY,
       });
       const userInfo = prisma.user.findUnique({
+        select: { uid: true, id: true, nickname: true },
         where: { uid: verifiedToken.uid },
       });
-      userInfo; // 이거 pwd딜리트하기
-      return prisma.user.findUnique({ where: { uid: verifiedToken.uid } });
+      return userInfo;
     } catch (err) {
       console.log(err);
       switch (err.message) {
