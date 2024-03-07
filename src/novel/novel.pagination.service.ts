@@ -12,6 +12,7 @@ export class NovelPaginationService {
     size: number,
     category?: Category,
     query?: string,
+    userId?: number,
   ): Promise<PaginationMetaDto> {
     const total: number = await prisma.novel.count({
       where: {
@@ -20,6 +21,9 @@ export class NovelPaginationService {
           title: {
             contains: query,
           },
+        }),
+        ...(userId && {
+          uid: userId,
         }),
       },
     });

@@ -16,7 +16,7 @@ import {
   FindNovelListDto,
   FindNovelListCategoryDto,
   FindNovelListViewTypeDto,
-  SearchNovelListDto,
+  SearchNovelListDto, FindNovelListUserDto
 } from '@/novel/dto';
 import { Novel, User } from '@prisma/client';
 import { AuthGuard } from '@nestjs/passport';
@@ -48,6 +48,14 @@ export class NovelController {
   @Get(':id')
   findById(@Param('id', new ParseIntPipe()) id: number): Promise<Novel> {
     return this.novelService.findById(id);
+  }
+
+  @Get('user/:userId')
+  findByUserFeedType(
+    @Param('userId', new ParseIntPipe()) userId: number,
+    @Query() dto: FindNovelListUserDto,
+  ) {
+    return this.novelService.findByUserFeedType(userId, dto);
   }
 
   @Post()

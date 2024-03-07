@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import {
   CreateNovelDto,
   FindNovelListCategoryDto,
-  FindNovelListDto,
+  FindNovelListDto, FindNovelListUserDto,
   FindNovelListViewTypeDto,
-  SearchNovelListDto,
+  SearchNovelListDto
 } from '@/novel/dto';
 import { Novel, PrismaClient } from '@prisma/client';
-import { ViewType } from '@/novel/enums';
+import { UserFeedType, ViewType } from '@/novel/enums';
 import { NovelPaginationService } from '@/novel/novel.pagination.service';
 
 const prisma = new PrismaClient();
@@ -93,6 +93,45 @@ export class NovelService {
         views: novel.views + 1,
       },
     });
+  }
+
+  async findByUserFeedType(
+    userId: number,
+    { userFeedType, index, size }: FindNovelListUserDto,
+  ) {
+    const novelList = await prisma.novel.findMany({
+      ...(userFeedType === UserFeedType.USER_LIKED && {
+        include: {
+          novel_likes: true,
+        },
+      }),
+      where: {
+        user_uid: userId,
+      },
+      orderBy: {
+        uid: 'desc',
+      },
+      skip: (index - 1) * size,
+      take: size,
+    });
+
+    const novelLikedList = novelList.map((novel) => {
+      return {
+        ...novel,
+        novel_likes: novel.novel_likes.length,
+      };
+    });
+
+    return {
+      data: novelLikedList,
+      meta: await this.novelPaginationService.getMetadata(
+        index,
+        size,
+        null,
+        null,
+        userId,
+      ),
+    };
   }
 
   async createNovel(
