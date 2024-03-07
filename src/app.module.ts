@@ -5,19 +5,22 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './auth/jwt.strategy';
+import { AiController } from './ai/ai.controller';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
     NovelModule,
     UserModule,
     AuthModule,
+    AiModule,
     ConfigModule.forRoot({
       envFilePath: '.env',
       isGlobal: true,
     }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
-  controllers: [],
+  controllers: [AiController],
   providers: [JwtStrategy],
 })
 export class AppModule {}
