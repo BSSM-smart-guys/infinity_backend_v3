@@ -1,14 +1,8 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
-import {
-  HttpException,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { TokenPayload } from './tokenPayload.interface';
-import { UserService } from 'src/user/user.service';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -17,7 +11,7 @@ const prisma = new PrismaClient();
 export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
-  public getJwtToken(uid: number) {
+  public createToken(uid: number) {
     const payload: TokenPayload = { uid };
     const token = this.jwtService.sign(payload, {
       expiresIn: '12h',
