@@ -28,23 +28,21 @@ export class NovelController {
 
   @Get()
   findByViewType(
-    @Query() { viewType, index, size }: FindNovelListViewTypeDto,
+    @Query() dto: FindNovelListViewTypeDto,
   ): Promise<FindNovelListDto> {
-    return this.novelService.findByViewType(viewType, index, size);
+    return this.novelService.findByViewType(dto);
   }
 
   @Get('category')
   findByCategory(
-    @Query() { category, index, size }: FindNovelListCategoryDto,
+    @Query() dto: FindNovelListCategoryDto,
   ): Promise<FindNovelListDto> {
-    return this.novelService.findByCategory(category, index, size);
+    return this.novelService.findByCategory(dto);
   }
 
   @Get('search')
-  searchNovelList(
-    @Query() { query, index, size, viewType }: SearchNovelListDto,
-  ): Promise<FindNovelListDto> {
-    return this.novelService.searchNovel(query, index, size, viewType);
+  searchNovelList(@Query() dto: SearchNovelListDto): Promise<FindNovelListDto> {
+    return this.novelService.searchNovel(dto);
   }
 
   @Get(':id')

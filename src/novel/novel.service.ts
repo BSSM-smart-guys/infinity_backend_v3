@@ -1,7 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { CreateNovelDto, FindNovelListDto } from '@/novel/dto';
+import {
+  CreateNovelDto,
+  FindNovelListCategoryDto,
+  FindNovelListDto,
+  FindNovelListViewTypeDto,
+  SearchNovelListDto,
+} from '@/novel/dto';
 import { Novel, PrismaClient } from '@prisma/client';
-import { Category, ViewType } from '@/novel/enums';
+import { ViewType } from '@/novel/enums';
 import { NovelPaginationService } from '@/novel/novel.pagination.service';
 
 const prisma = new PrismaClient();
@@ -12,11 +18,11 @@ export class NovelService {
     private readonly novelPaginationService: NovelPaginationService,
   ) {}
 
-  async findByViewType(
-    viewType: ViewType,
-    index: number,
-    size: number,
-  ): Promise<FindNovelListDto> {
+  async findByViewType({
+    viewType,
+    index,
+    size,
+  }: FindNovelListViewTypeDto): Promise<FindNovelListDto> {
     return {
       data: await prisma.novel.findMany({
         orderBy: this.orderByViewType(viewType),
@@ -27,11 +33,11 @@ export class NovelService {
     };
   }
 
-  async findByCategory(
-    category: Category,
-    index: number,
-    size: number,
-  ): Promise<FindNovelListDto> {
+  async findByCategory({
+    category,
+    index,
+    size,
+  }: FindNovelListCategoryDto): Promise<FindNovelListDto> {
     return {
       data: await prisma.novel.findMany({
         where: {
@@ -48,12 +54,12 @@ export class NovelService {
     };
   }
 
-  async searchNovel(
-    query: string,
-    index: number,
-    size: number,
-    viewType: ViewType,
-  ): Promise<FindNovelListDto> {
+  async searchNovel({
+    query,
+    index,
+    size,
+    viewType,
+  }: SearchNovelListDto): Promise<FindNovelListDto> {
     return {
       data: await prisma.novel.findMany({
         where: {
