@@ -3,7 +3,7 @@ dotenv.config();
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -16,11 +16,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
   async validate(payload: any) {
-    const userInfo = await prisma.user.findUnique({
-      select: { id: true },
+    const user: User = await prisma.user.findUnique({
       where: { uid: payload.uid },
     });
-    if (!userInfo) throw new UnauthorizedException();
-    return true;
+    if (!user) throw new UnauthorizedException();
+    return user;
   }
 }

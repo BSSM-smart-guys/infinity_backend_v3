@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { NovelService } from './novel.service';
 import {
@@ -17,7 +18,9 @@ import {
   FindNovelListViewTypeDto,
   SearchNovelListDto,
 } from '@/novel/dto';
-import { Novel } from '@prisma/client';
+import { Novel, User } from '@prisma/client';
+import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from '@/user/get-user.decorator';
 
 @Controller('novel')
 export class NovelController {
@@ -50,12 +53,17 @@ export class NovelController {
   }
 
   @Post()
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(201)
-  createNovel(@Body() createNovelDto: CreateNovelDto): Promise<number> {
-    return this.novelService.createNovel(createNovelDto);
+  createNovel(
+    @Body() createNovelDto: CreateNovelDto,
+    @GetUser() { uid: user_uid }: User,
+  ): Promise<number> {
+    return this.novelService.createNovel(user_uid, createNovelDto);
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard('jwt'))
   @HttpCode(204)
   deleteNovel(@Param('id', new ParseIntPipe()) id: number): Promise<void> {
     return this.novelService.deleteNovel(id);
