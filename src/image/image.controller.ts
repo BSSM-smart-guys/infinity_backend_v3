@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { ImageService } from '@/image/image.service';
 import { ImageGenerateDto } from '@/image/dto/request';
 
