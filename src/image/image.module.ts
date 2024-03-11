@@ -14,8 +14,8 @@ const imageDirectory: string = '/infinity/';
     OpenAI,
     ServeStaticModule.forRoot({
       rootPath: join(imageDirectory),
-      serveRoot: '/image'
-    })
+      serveRoot: '/image',
+    }),
   ],
 })
 export class ImageModule {}
