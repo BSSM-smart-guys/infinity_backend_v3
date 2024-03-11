@@ -7,6 +7,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './auth/jwt.strategy';
 import { AiController } from './ai/ai.controller';
 import { AiModule } from './ai/ai.module';
+import { ImageModule } from './image/image.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { AiModule } from './ai/ai.module';
       isGlobal: true,
     }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
+    ImageModule,
   ],
   controllers: [AiController],
   providers: [JwtStrategy],
