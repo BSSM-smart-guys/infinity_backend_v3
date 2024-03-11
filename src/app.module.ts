@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { NovelModule } from './novel/novel.module';
+import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
@@ -8,9 +10,14 @@ import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
+    NovelModule,
     UserModule,
     AuthModule,
     AiModule,
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+      isGlobal: true,
+    }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
   controllers: [AiController],

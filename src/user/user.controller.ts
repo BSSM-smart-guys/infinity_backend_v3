@@ -8,7 +8,6 @@ import {
   Put,
   Headers,
   UseGuards,
-  Res,
   HttpStatus,
   Query,
 } from '@nestjs/common';
@@ -19,7 +18,7 @@ import { AuthService } from '@/auth/auth.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 
-@Controller('api/user')
+@Controller('user')
 export class UserController {
   constructor(
     private readonly userService: UserService,
