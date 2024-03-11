@@ -4,8 +4,9 @@ import { ImageService } from './image.service';
 import OpenAI from 'openai';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import config from '@/config';
 
-const imageDirectory: string = '/infinity/';
+const imageDirectory: string = config().image.directory;
 
 @Module({
   controllers: [ImageController],

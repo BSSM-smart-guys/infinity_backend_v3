@@ -5,8 +5,8 @@ import * as fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 
-const imageDirectory: string = '/infinity/';
-const ext: string = '.png';
+const imageDirectory: string = config().image.directory;
+const ext: string = config().image.ext;
 
 @Injectable()
 export class ImageService {

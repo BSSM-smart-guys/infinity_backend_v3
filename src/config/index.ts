@@ -5,4 +5,8 @@ export default () => ({
   openAi: {
     apiKey: process.env.OPENAI_API_KEY,
   },
+  image: {
+    directory: process.env.IMAGE_DIRECTORY,
+    ext: process.env.IMAGE_EXT,
+  },
 });
