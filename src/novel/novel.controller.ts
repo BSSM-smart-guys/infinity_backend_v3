@@ -16,12 +16,15 @@ import {
   FindNovelListDto,
   FindNovelListCategoryDto,
   FindNovelListViewTypeDto,
-  SearchNovelListDto, FindNovelListUserDto
+  SearchNovelListDto,
+  FindNovelListUserDto,
 } from '@/novel/dto';
 import { Novel, User } from '@prisma/client';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '@/user/get-user.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Novel')
 @Controller('novel')
 export class NovelController {
   constructor(private readonly novelService: NovelService) {}

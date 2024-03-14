@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 import { Injectable } from '@nestjs/common';
 import OpenAI from 'openai';
+import { KeywordDto } from './dto/keywordDto';
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -10,7 +11,6 @@ const openai = new OpenAI({
 export class AiService {
   async getAI(keyword: KeywordDto) {
     const { characters, events, backgrounds } = keyword;
-    console.log(keyword);
     return openai.chat.completions.create({
       messages: [
         { role: 'system', content: 'you are a novelist.' },
