@@ -3,7 +3,7 @@ dotenv.config();
 import { Injectable } from '@nestjs/common';
 import OpenAI from 'openai';
 const openai = new OpenAI({
-  apiKey: process.env.APIKEY,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 @Injectable()
