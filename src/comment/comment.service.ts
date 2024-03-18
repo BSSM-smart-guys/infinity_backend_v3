@@ -8,9 +8,8 @@ const prisma = new PrismaClient();
 @Injectable()
 export class CommentService {
   async create(createCommentDto: CreateCommentDto, user_uid: any) {
-    console.log(user_uid);
     const { novel_uid, review } = createCommentDto;
-    return prisma.comment.create({
+    return await prisma.comment.create({
       data: {
         novel_uid,
         user_uid,
@@ -19,8 +18,20 @@ export class CommentService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} comment`;
+  async findOne(novel_uid: number) {
+    return await prisma.comment.findMany({
+      include: {
+        user: {
+          select: {
+            uid: true,
+            nickname: true,
+          },
+        },
+      },
+      where: {
+        novel_uid,
+      },
+    });
   }
 
   update(id: number, updateCommentDto: UpdateCommentDto) {
