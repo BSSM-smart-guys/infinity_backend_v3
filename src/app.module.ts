@@ -8,6 +8,7 @@ import { JwtStrategy } from './auth/jwt.strategy';
 import { AiController } from './ai/ai.controller';
 import { AiModule } from './ai/ai.module';
 import { ImageModule } from './image/image.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ImageModule } from './image/image.module';
     }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     ImageModule,
+    CommentModule,
   ],
   controllers: [AiController],
   providers: [JwtStrategy],

@@ -72,6 +72,7 @@ export class NovelController {
     return this.novelService.createNovel(user_uid, createNovelDto);
   }
 
+  // 좋아요
   @Post('like/:novelId')
   likeStatus(
     @Body() createLikeDto: CreateLikeDto,
