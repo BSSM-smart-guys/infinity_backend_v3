@@ -22,7 +22,7 @@ import {
 import { Novel, User } from '@prisma/client';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '@/user/get-user.decorator';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import CreateLikeDto from './dto/request/create-like-dto';
 
 @ApiTags('Novel')
@@ -73,6 +73,7 @@ export class NovelController {
   }
 
   // 좋아요
+  @ApiOperation({ summary: '좋아요' })
   @Post('like/:novelId')
   @UseGuards(AuthGuard('jwt'))
   likeStatus(

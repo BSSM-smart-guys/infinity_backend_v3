@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -34,11 +33,18 @@ export class CommentService {
     });
   }
 
-  update(id: number, updateCommentDto: UpdateCommentDto) {
-    return `This action updates a #${id} comment`;
+  update(uid: number, review: object) {
+    return prisma.comment.update({
+      where: {
+        uid,
+      },
+      data: review,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} comment`;
+  remove(uid: number) {
+    return prisma.comment.delete({
+      where: { uid },
+    });
   }
 }
