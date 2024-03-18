@@ -2,13 +2,15 @@ import { Injectable } from '@nestjs/common';
 import {
   CreateNovelDto,
   FindNovelListCategoryDto,
-  FindNovelListDto, FindNovelListUserDto,
+  FindNovelListDto,
+  FindNovelListUserDto,
   FindNovelListViewTypeDto,
-  SearchNovelListDto
+  SearchNovelListDto,
 } from '@/novel/dto';
 import { Novel, PrismaClient } from '@prisma/client';
 import { UserFeedType, ViewType } from '@/novel/enums';
 import { NovelPaginationService } from '@/novel/novel.pagination.service';
+import CreateLikeDto from './dto/request/create-like-dto';
 
 const prisma = new PrismaClient();
 
@@ -166,5 +168,29 @@ export class NovelService {
     } else if (viewType === ViewType.POPULAR) {
       return [{ views: 'desc' }, { uid: 'desc' }];
     }
+  }
+
+  async likeStatus(novel_uid: number, createLikeDto: CreateLikeDto) {
+    const { user_uid } = createLikeDto;
+
+    const likeCheck = await prisma.novel_Like.findMany({
+      where: {
+        user_uid,
+      },
+    });
+
+    if (likeCheck.length == 0) {
+      return await prisma.novel_Like.create({
+        data: { novel_uid, user_uid },
+      });
+    }
+    return await prisma.novel_Like.delete({
+      where: {
+        user_uid_novel_uid: {
+          user_uid,
+          novel_uid,
+        },
+      },
+    });
   }
 }
