@@ -74,6 +74,7 @@ export class NovelController {
 
   // 좋아요
   @Post('like/:novelId')
+  @UseGuards(AuthGuard('jwt'))
   likeStatus(
     @Body() createLikeDto: CreateLikeDto,
     @Param('novelId', new ParseIntPipe()) novelId: number,
