@@ -176,6 +176,7 @@ export class NovelService {
     const likeCheck = await prisma.novel_Like.findMany({
       where: {
         user_uid,
+        novel_uid,
       },
     });
 
