@@ -46,7 +46,7 @@ model Novel {
 
 model Novel_Like {
   user      User    @relation(fields: [user_uid], references: [uid])
-  user_uid  Int    
+  user_uid  Int
   novel     Novel   @relation(fields: [novel_uid], references: [uid])
   novel_uid Int
   @@id([user_uid, novel_uid])

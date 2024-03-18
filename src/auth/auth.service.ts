@@ -22,7 +22,8 @@ export class AuthService {
 
   public validateToken(token: string) {
     try {
-      const verifiedToken: any = this.jwtService.verify(token, {
+      const [Bearer, JWT] = token.split(' ');
+      const verifiedToken: any = this.jwtService.verify(JWT, {
         secret: process.env.SECRET_KEY,
       });
       const userInfo = prisma.user.findUnique({

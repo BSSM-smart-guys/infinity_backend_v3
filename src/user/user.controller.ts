@@ -29,12 +29,10 @@ export class UserController {
   @ApiOperation({ summary: '유저 정보 by JWT API' })
   @Get('/')
   findByJWT(@Headers('Authorization') token: string) {
-    console.log(token);
-    const [Bearer, JWT] = token.split(' ');
-    return this.authService.validateToken(JWT);
+    return this.authService.validateToken(token);
   }
 
-  @ApiOperation({ summary: '유저 정보 API(쓸 일 없음)' })
+  @ApiOperation({ summary: '유저 정보 API(쓸 일 없을듯)' })
   @Get(':uid')
   findOne(@Param('uid') uid: string) {
     return this.userService.findOne(+uid);
