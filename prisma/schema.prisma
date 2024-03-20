@@ -19,6 +19,7 @@ enum Category {
   DAILY
   THRILLER
   FEATURE
+  ETC
 }
 
 model User {

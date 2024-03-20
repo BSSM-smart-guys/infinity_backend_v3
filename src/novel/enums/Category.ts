@@ -4,6 +4,7 @@ enum Category {
   DAILY = 'DAILY',
   THRILLER = 'THRILLER',
   FEATURE = 'FEATURE',
+  ETC = 'ETC',
 }
 
 export default Category;
