@@ -151,6 +151,7 @@ export class NovelController {
             Category.FEATURE,
             Category.ROMANCE,
             Category.THRILLER,
+            Category.ETC,
           ],
           description: '하나면 선택해서 문자열로 보내면 됨',
         },
