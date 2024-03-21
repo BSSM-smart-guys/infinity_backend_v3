@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   HttpCode,
   Param,
   ParseIntPipe,
@@ -104,6 +105,15 @@ export class NovelController {
   @ApiOperation({ summary: '소설 상세 조회' })
   findById(@Param('id', new ParseIntPipe()) id: number): Promise<Novel> {
     return this.novelService.findById(id);
+  }
+
+  @Get('/loggedin/:id')
+  @ApiOperation({ summary: '로그인된 유저용 소설 상세 조회' })
+  findByIdWithUser(
+    @Param('id', new ParseIntPipe()) id: number,
+    @Headers('Authorization') token: string,
+  ) {
+    return this.novelService.findByIdWithUser(id, token);
   }
 
   @Get('user/:userId')
