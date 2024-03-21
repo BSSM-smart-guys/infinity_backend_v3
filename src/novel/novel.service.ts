@@ -86,13 +86,20 @@ export class NovelService {
         uid: id,
       },
     });
-
+    console.log(novel);
     return prisma.novel.update({
       where: {
         uid: id,
       },
       data: {
         views: novel.views + 1,
+      },
+      include: {
+        novel_likes: {
+          where: {
+            novel_uid: id,
+          },
+        },
       },
     });
   }
