@@ -11,6 +11,7 @@ import { Novel, PrismaClient } from '@prisma/client';
 import { UserFeedType, ViewType } from '@/novel/enums';
 import { NovelPaginationService } from '@/novel/novel.pagination.service';
 import CreateLikeDto from './dto/request/create-like-dto';
+import { AuthService } from '@/auth/auth.service';
 
 const prisma = new PrismaClient();
 
@@ -18,7 +19,39 @@ const prisma = new PrismaClient();
 export class NovelService {
   constructor(
     private readonly novelPaginationService: NovelPaginationService,
+    private readonly authService: AuthService,
   ) {}
+  async findByIdWithUser(uid: number, token: string) {
+    const user = await this.authService.validateToken(token);
+    const novelsWithUserLike = await prisma.novel.findMany({
+      where: {
+        uid,
+      },
+      include: {
+        novel_likes: {
+          where: {
+            user_uid: user.uid,
+          },
+        },
+      },
+    });
+
+    await prisma.novel.update({
+      where: {
+        uid,
+      },
+      data: {
+        views: novelsWithUserLike[0].views + 1,
+      },
+    });
+
+    const novelsWithUserLikeAndUserUid = novelsWithUserLike.map((novel) => ({
+      ...novel,
+      like: novel.novel_likes.some((like) => like.user_uid === user.uid),
+    }));
+
+    return novelsWithUserLikeAndUserUid;
+  }
 
   async findByViewType({
     viewType,
@@ -86,7 +119,6 @@ export class NovelService {
         uid: id,
       },
     });
-    console.log(novel);
     return prisma.novel.update({
       where: {
         uid: id,
