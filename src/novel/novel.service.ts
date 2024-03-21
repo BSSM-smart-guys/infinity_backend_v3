@@ -21,37 +21,6 @@ export class NovelService {
     private readonly novelPaginationService: NovelPaginationService,
     private readonly authService: AuthService,
   ) {}
-  async findByIdWithUser(uid: number, token: string) {
-    const user = await this.authService.validateToken(token);
-    const novelsWithUserLike = await prisma.novel.findMany({
-      where: {
-        uid,
-      },
-      include: {
-        novel_likes: {
-          where: {
-            user_uid: user.uid,
-          },
-        },
-      },
-    });
-
-    await prisma.novel.update({
-      where: {
-        uid,
-      },
-      data: {
-        views: novelsWithUserLike[0].views + 1,
-      },
-    });
-
-    const novelsWithUserLikeAndUserUid = novelsWithUserLike.map((novel) => ({
-      ...novel,
-      like: novel.novel_likes.some((like) => like.user_uid === user.uid),
-    }));
-
-    return novelsWithUserLikeAndUserUid;
-  }
 
   async findByViewType({
     viewType,
@@ -113,13 +82,14 @@ export class NovelService {
     };
   }
 
-  async findById(id: number): Promise<Novel> {
+  async findById(id: number): Promise<any> {
     const novel = await prisma.novel.findUnique({
       where: {
         uid: id,
       },
     });
-    return prisma.novel.update({
+
+    prisma.novel.update({
       where: {
         uid: id,
       },
@@ -134,8 +104,76 @@ export class NovelService {
         },
       },
     });
+
+    const findNovel = await prisma.novel.findMany({
+      where: {
+        uid: id,
+      },
+      include: {
+        novel_likes: {
+          where: {
+            novel_uid: id,
+          },
+        },
+      },
+    });
+
+    const userResult = await prisma.user.findUnique({
+      select: {
+        nickname: true,
+      },
+      where: {
+        uid: findNovel[0].user_uid,
+      },
+    });
+    const novelResult = findNovel.map((novel) => ({
+      ...novel,
+      likeCount: novel.novel_likes.length,
+    }));
+    return { userResult, novelResult };
   }
 
+  async findByIdWithUser(uid: number, token: string) {
+    const user = await this.authService.validateToken(token);
+    const novelsWithUserLike = await prisma.novel.findMany({
+      where: {
+        uid,
+      },
+      include: {
+        novel_likes: {
+          where: {
+            user_uid: user.uid,
+          },
+        },
+      },
+    });
+
+    await prisma.novel.update({
+      where: {
+        uid,
+      },
+      data: {
+        views: novelsWithUserLike[0].views + 1,
+      },
+    });
+
+    const userResult = await prisma.user.findUnique({
+      select: {
+        nickname: true,
+      },
+      where: {
+        uid: novelsWithUserLike[0].user_uid,
+      },
+    });
+
+    const novelResult = novelsWithUserLike.map((novel) => ({
+      ...novel,
+      like: novel.novel_likes.some((like) => like.user_uid === user.uid),
+      likeCount: novel.novel_likes.length,
+    }));
+
+    return { userResult, novelResult };
+  }
   async findByUserFeedType(
     userId: number,
     { userFeedType, index, size }: FindNovelListUserDto,
