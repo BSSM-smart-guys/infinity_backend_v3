@@ -11,12 +11,13 @@ const openai = new OpenAI({
 export class AiService {
   async getAI(keyword: KeywordDto) {
     const { characters, events, backgrounds } = keyword;
+    console.log(keyword)
     return openai.chat.completions.create({
       messages: [
         { role: 'system', content: 'you are a novelist.' },
         {
           role: 'user',
-          content: `write only novel in Korean with this keywords - characters:[${characters}], events: [${events}], backgrounds: [${backgrounds}]. Don't say anything except about novel, Don't write a title. `,
+          content: `write only novel in Korean with this keywords - characters:[${characters}], events: [${events}], backgrounds: [${backgrounds}]. Don't say anything except about novel, Don't write a title, write in between 1500 ~ 2500 characters.`,
         },
       ],
       model: 'gpt-3.5-turbo',

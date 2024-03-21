@@ -12,13 +12,15 @@ export class AiController {
   @ApiOperation({ summary: '소설 작성 API' })
   @Post()
   async getAIResponse(
-    @Body('keyword') keyword: KeywordDto,
+    @Body() body: any,
     @Res() res: Response,
   ) {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
-    console.log(keyword);
+
+    const keyword: KeywordDto = body.keyword;
+    // console.log(keyword);
 
     const result = await this.aiService.getAI(keyword);
     for await (const chunk of result) {
