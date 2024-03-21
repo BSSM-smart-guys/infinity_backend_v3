@@ -26,17 +26,23 @@ export class UserController {
     private readonly authService: AuthService,
   ) {}
 
-  @ApiOperation({ summary: '유저 정보 by JWT API' })
+  @ApiOperation({ summary: '유저 정보 + 각종 정보 by JWT API' })
   @Get('/')
   findByJWT(@Headers('Authorization') token: string) {
     return this.authService.validateTokenWithInfo(token);
   }
 
-  @ApiOperation({ summary: '유저 정보 API(쓸 일 없을듯)' })
-  @Get(':uid')
-  findOne(@Param('uid') uid: string) {
-    return this.userService.findOne(+uid);
+  @ApiOperation({ summary: '유저 정보 by JWT API' })
+  @Get('/onlyuser')
+  findJustUserByJWT(@Headers('Authorization') token: string) {
+    return this.authService.validateToken(token);
   }
+
+  // @ApiOperation({ summary: '유저 정보 API(쓸 일 없을듯)' })
+  // @Get(':uid')
+  // findOne(@Param('uid') uid: string) {
+  //   return this.userService.findOne(+uid);
+  // }
 
   @ApiOperation({ summary: '유저 회원가입 API' })
   @Post('/signup')
