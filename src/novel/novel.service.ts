@@ -45,12 +45,13 @@ export class NovelService {
       },
     });
 
-    const novelsWithUserLikeAndUserUid = novelsWithUserLike.map((novel) => ({
+    const novelResult = novelsWithUserLike.map((novel) => ({
       ...novel,
       like: novel.novel_likes.some((like) => like.user_uid === user.uid),
+      likeCount: novel.novel_likes.length,
     }));
 
-    return novelsWithUserLikeAndUserUid;
+    return { user, novelResult };
   }
 
   async findByViewType({
