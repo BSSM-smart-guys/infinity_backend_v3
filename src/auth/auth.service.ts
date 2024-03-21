@@ -46,4 +46,39 @@ export class AuthService {
       }
     }
   }
+
+  async validateTokenWithInfo(token: string) {
+    const [Bearer, JWT] = token.split(' ');
+    const verifiedToken: any = this.jwtService.verify(JWT, {
+      secret: process.env.SECRET_KEY,
+    });
+
+    const userInfo = await prisma.user.findUnique({
+      select: { uid: true, id: true, nickname: true },
+      where: { uid: verifiedToken.uid },
+    });
+
+    const totalLikes = await prisma.novel_Like.count({
+      where: {
+        user_uid: verifiedToken.uid,
+      },
+    });
+
+    const totalNovels = await prisma.novel.count({
+      where: {
+        user_uid: verifiedToken.uid,
+      },
+    });
+    const {
+      _sum: { views },
+    } = await prisma.novel.aggregate({
+      _sum: {
+        views: true,
+      },
+      where: {
+        user_uid: verifiedToken.uid,
+      },
+    });
+    return { userInfo, totalLikes, totalNovels, views };
+  }
 }
