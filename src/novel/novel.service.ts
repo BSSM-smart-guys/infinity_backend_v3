@@ -35,6 +35,16 @@ export class NovelService {
         },
       },
     });
+
+    await prisma.novel.update({
+      where: {
+        uid,
+      },
+      data: {
+        views: novelsWithUserLike[0].views + 1,
+      },
+    });
+
     const novelsWithUserLikeAndUserUid = novelsWithUserLike.map((novel) => ({
       ...novel,
       like: novel.novel_likes.some((like) => like.user_uid === user.uid),
