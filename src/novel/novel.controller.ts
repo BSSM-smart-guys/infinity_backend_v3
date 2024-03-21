@@ -103,7 +103,7 @@ export class NovelController {
 
   @Get(':id')
   @ApiOperation({ summary: '소설 상세 조회' })
-  findById(@Param('id', new ParseIntPipe()) id: number): Promise<Novel> {
+  findById(@Param('id', new ParseIntPipe()) id: number): Promise<any> {
     return this.novelService.findById(id);
   }
 
