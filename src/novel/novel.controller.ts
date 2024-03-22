@@ -165,6 +165,9 @@ export class NovelController {
           ],
           description: '하나면 선택해서 문자열로 보내면 됨',
         },
+        content: {
+          type: 'string',
+        },
       },
     },
   })
