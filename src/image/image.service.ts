@@ -4,6 +4,7 @@ import config from '@/config';
 import * as fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
+import { TranslationService } from './translation.service';
 
 const imageDirectory: string = config().image.directory;
 const ext: string = config().image.ext;
@@ -12,16 +13,18 @@ const ext: string = config().image.ext;
 export class ImageService {
   private readonly openai: OpenAI;
 
-  constructor() {
+  constructor(private readonly translationService: TranslationService) {
     this.openai = new OpenAI({
       apiKey: config().openAi.apiKey,
     });
   }
 
   async generateImage(prompt: string) {
+    const translateRes = await this.translationService.translate(prompt);
+    const translatedPrompt = translateRes.data.translations[0].text;
     const response = await this.openai.images.generate({
       model: 'dall-e-2',
-      prompt: prompt,
+      prompt: translatedPrompt,
       n: 1,
       size: '512x512',
     });

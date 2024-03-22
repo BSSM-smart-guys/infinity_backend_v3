@@ -5,12 +5,13 @@ import OpenAI from 'openai';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import config from '@/config';
+import { TranslationService } from './translation.service';
 
 const imageDirectory: string = config().image.directory;
 
 @Module({
   controllers: [ImageController],
-  providers: [ImageService],
+  providers: [ImageService, TranslationService],
   imports: [
     OpenAI,
     ServeStaticModule.forRoot({
