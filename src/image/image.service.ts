@@ -21,7 +21,7 @@ export class ImageService {
   async generateImage(prompt: string) {
     const response = await this.openai.images.generate({
       model: 'dall-e-2',
-      prompt,
+      prompt: prompt,
       n: 1,
       size: '512x512',
     });
@@ -30,11 +30,15 @@ export class ImageService {
 
     const { data } = await axios.get(imageUrl, { responseType: 'arraybuffer' });
 
-    fs.writeFile(imageDirectory + fileName, data, (err) => {
-      if (err) throw err;
+    return new Promise<string>((resolve, reject) => {
+      fs.writeFile(imageDirectory + fileName, data, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve('/image/' + fileName);
+        }
+      });
     });
-
-    return '/image/' + fileName;
   }
 
   private createFileName() {
