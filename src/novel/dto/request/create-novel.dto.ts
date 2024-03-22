@@ -2,7 +2,7 @@ import { Category } from '@/novel/enums';
 import { IsEnum, IsNotEmpty, IsString, IsUrl } from 'class-validator';
 
 class CreateNovelDto {
-  @IsUrl()
+  @IsString()
   @IsNotEmpty()
   thumbnail: string;
 
