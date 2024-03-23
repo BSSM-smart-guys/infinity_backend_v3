@@ -197,7 +197,7 @@ export class NovelService {
     const novelLikedList = novelList.map((novel) => {
       return {
         ...novel,
-        novel_likes: novel.novel_likes.length,
+        novel_likes: novel.novel_likes?.length ?? 0,
       };
     });
 
