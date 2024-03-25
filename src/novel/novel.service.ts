@@ -174,26 +174,41 @@ export class NovelService {
 
     return { userResult, novelResult };
   }
-
   async findByUserFeedType(
     userId: number,
     { userFeedType, index, size }: FindNovelListUserDto,
   ) {
-    const novelList = await prisma.novel.findMany({
-      ...(userFeedType === UserFeedType.USER_LIKED && {
+    let novelList;
+    if (userFeedType === UserFeedType.USER_LIKED) {
+      novelList = await prisma.novel.findMany({
         include: {
           novel_likes: true,
         },
-      }),
-      where: {
-        user_uid: userId,
-      },
-      orderBy: {
-        uid: 'desc',
-      },
-      skip: (index - 1) * size,
-      take: size,
-    });
+        where: {
+          novel_likes: {
+            some: {
+              user_uid: userId,
+            },
+          },
+        },
+        orderBy: {
+          uid: 'desc',
+        },
+        skip: (index - 1) * size,
+        take: size,
+      });
+    } else {
+      novelList = await prisma.novel.findMany({
+        where: {
+          user_uid: userId,
+        },
+        orderBy: {
+          uid: 'desc',
+        },
+        skip: (index - 1) * size,
+        take: size,
+      });
+    };
 
     const novelLikedList = novelList.map((novel) => {
       return {
