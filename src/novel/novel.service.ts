@@ -82,14 +82,14 @@ export class NovelService {
     };
   }
 
-  async findById(id: number): Promise<any> {
+  async findById(id: number) {
     const novel = await prisma.novel.findUnique({
       where: {
         uid: id,
       },
     });
 
-    prisma.novel.update({
+    await prisma.novel.update({
       where: {
         uid: id,
       },
@@ -174,6 +174,7 @@ export class NovelService {
 
     return { userResult, novelResult };
   }
+
   async findByUserFeedType(
     userId: number,
     { userFeedType, index, size }: FindNovelListUserDto,
