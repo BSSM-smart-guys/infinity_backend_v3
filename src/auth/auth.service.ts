@@ -58,20 +58,24 @@ export class AuthService {
       where: {
         user_uid: targetUser.uid,
       },
-      include: {
-        novel_likes: {
-          where: {
-            user_uid: targetUser.uid,
-          },
-        },
+      select: {
+        uid: true,
       },
     });
 
-    const novelLikeList = usersNovels
-      .map((novel) => novel.novel_likes[0])
-      .filter((like) => like !== undefined);
+    const totalLikes = usersNovels.map(async (novel) => {
+      return await prisma.novel_Like.count({
+        where: {
+          novel_uid: novel.uid,
+        },
+      });
+    });
 
-    const totalLikes = novelLikeList.length;
+    let totalLikesCount = 0;
+
+    for (const e of totalLikes) {
+      totalLikesCount += await e;
+    }
 
     const totalNovels = await prisma.novel.count({
       where: {
@@ -88,6 +92,6 @@ export class AuthService {
         user_uid: targetUser.uid,
       },
     });
-    return { userInfo, totalLikes, totalNovels, views };
+    return { userInfo, totalLikesCount, totalNovels, views };
   }
 }
