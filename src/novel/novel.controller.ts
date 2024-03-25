@@ -186,7 +186,6 @@ export class NovelController {
     @Body() createLikeDto: CreateLikeDto,
     @Param('novelId', new ParseIntPipe()) novelId: number,
   ) {
-    console.log(novelId, createLikeDto);
     return this.novelService.likeStatus(novelId, createLikeDto);
   }
 
