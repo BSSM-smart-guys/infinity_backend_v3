@@ -33,7 +33,7 @@ export class UserController {
   }
 
   @ApiOperation({ summary: '유저 정보 by JWT API' })
-  @Get('/onlyuser')
+  @Get('/onlyusers')
   findJustUserByJWT(@Headers('Authorization') token: string) {
     return this.authService.validateToken(token);
   }
