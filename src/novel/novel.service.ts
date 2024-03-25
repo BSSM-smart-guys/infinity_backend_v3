@@ -137,12 +137,12 @@ export class NovelService {
     const user = await this.authService.validateToken(token);
     const novelsWithUserLike = await prisma.novel.findMany({
       where: {
-        uid,
+        uid: uid,
       },
       include: {
         novel_likes: {
           where: {
-            user_uid: user.uid,
+            novel_uid: uid,
           },
         },
       },
