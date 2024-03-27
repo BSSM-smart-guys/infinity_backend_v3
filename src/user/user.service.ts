@@ -14,8 +14,6 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class UserService {
-  //constructor(private readonly authService: AuthService) {}
-
   async create(createUserDto: CreateUserDto) {
     const { id, nickname } = createUserDto;
     const saltrounds = 10;

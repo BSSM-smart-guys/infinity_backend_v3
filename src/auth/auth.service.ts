@@ -22,7 +22,7 @@ export class AuthService {
 
   public async validateToken(token: string) {
     try {
-      const [Bearer, JWT] = token.split(' ');
+      const [, JWT] = token.split(' ');
       const verifiedToken: any = this.jwtService.verify(JWT, {
         secret: process.env.SECRET_KEY,
       });
@@ -46,7 +46,7 @@ export class AuthService {
     }
   }
 
-  async validateTokenWithInfo(token: string) {
+  async validateTokenResponseWithInfo(token: string) {
     const targetUser = await this.validateToken(token);
 
     const userInfo = await prisma.user.findUnique({

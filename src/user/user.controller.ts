@@ -29,7 +29,7 @@ export class UserController {
   @ApiOperation({ summary: '유저 정보 + 각종 정보 by JWT API' })
   @Get('/')
   findByJWT(@Headers('Authorization') token: string) {
-    return this.authService.validateTokenWithInfo(token);
+    return this.authService.validateTokenResponseWithInfo(token);
   }
 
   @ApiOperation({ summary: '유저 정보 by JWT API' })
@@ -37,12 +37,6 @@ export class UserController {
   findJustUserByJWT(@Headers('Authorization') token: string) {
     return this.authService.validateToken(token);
   }
-
-  // @ApiOperation({ summary: '유저 정보 API(쓸 일 없을듯)' })
-  // @Get(':uid')
-  // findOne(@Param('uid') uid: string) {
-  //   return this.userService.findOne(+uid);
-  // }
 
   @ApiOperation({ summary: '유저 회원가입 API' })
   @Post('/signup')
@@ -56,7 +50,6 @@ export class UserController {
   async login(@Body() loginUserDto: LoginUserDto) {
     const authorize = await this.userService.login(loginUserDto);
     const token = this.authService.createToken(authorize);
-
     return { token };
   }
 
@@ -67,6 +60,7 @@ export class UserController {
     this.userService.update(+uid, updateUserDto);
     return HttpStatus.OK;
   }
+
   // @Delete(':id')
   // remove(@Param('id') id: string) {   // 프론트랑 상의 후 개발
   //   return this.userService.remove(+id);
