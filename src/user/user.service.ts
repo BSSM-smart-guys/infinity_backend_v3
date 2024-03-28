@@ -39,7 +39,6 @@ export class UserService {
     const pwdCompare = await bcrypt.compare(pwd, userInfo[0].pwd);
 
     if (pwdCompare) {
-      //  const payload = { id: userInfo[0].id, nickname: userInfo[0].nickname };
       return userInfo[0].uid;
     }
     throw new UnauthorizedException();
