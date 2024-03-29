@@ -24,7 +24,6 @@ import { CommentModule } from './comment/comment.module';
     ImageModule,
     CommentModule,
   ],
-  controllers: [AiController],
   providers: [JwtStrategy],
 })
 export class AppModule {}
