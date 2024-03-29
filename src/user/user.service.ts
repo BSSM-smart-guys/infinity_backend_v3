@@ -21,10 +21,10 @@ export class UserService {
     const duplicate = await prisma.user.findMany({
       where: { OR: [{ id }, { nickname }] }, // id, nickname 중 중복되는 것 찾기
     });
+
     if (duplicate.length != 0) throw new ConflictException(); // 중복되면 conflict
 
     const pwd = await bcrypt.hash(createUserDto.pwd, saltrounds);
-
     await prisma.user.create({
       data: { id, pwd, nickname },
     });
@@ -34,10 +34,11 @@ export class UserService {
 
   async login(loginUserDto: LoginUserDto) {
     const { id, pwd } = loginUserDto;
+
     const userInfo = await prisma.user.findMany({ where: { id } });
     if (userInfo.length == 0) throw new NotFoundException();
-    const pwdCompare = await bcrypt.compare(pwd, userInfo[0].pwd);
 
+    const pwdCompare = await bcrypt.compare(pwd, userInfo[0].pwd);
     if (pwdCompare) {
       return userInfo[0].uid;
     }
@@ -50,6 +51,7 @@ export class UserService {
       where: { uid },
     });
     if (!userInfo) throw new NotFoundException();
+
     return userInfo;
   }
 

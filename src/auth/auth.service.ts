@@ -5,7 +5,6 @@ import { TokenPayload } from './tokenPayload.interface';
 import { PrismaClient, User } from '@prisma/client';
 
 dotenv.config();
-
 const prisma = new PrismaClient();
 type UserWithOutPwd = Omit<User, 'pwd'>;
 
@@ -15,6 +14,7 @@ export class AuthService {
 
   public createToken(uid: number) {
     const payload: TokenPayload = { uid };
+
     return this.jwtService.sign(payload, {
       expiresIn: '12h',
       secret: process.env.SECRET_KEY,
@@ -27,12 +27,12 @@ export class AuthService {
       const verifiedToken: any = this.jwtService.verify(JWT, {
         secret: process.env.SECRET_KEY,
       });
+
       return await prisma.user.findUnique({
         select: { uid: true, id: true, nickname: true },
         where: { uid: verifiedToken.uid },
       });
     } catch (err) {
-      console.log(err);
       switch (err.message) {
         case 'invalid signature':
           throw new HttpException('유효하지 않은 토큰', 401);
