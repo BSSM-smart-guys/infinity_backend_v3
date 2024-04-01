@@ -95,6 +95,7 @@ export class NovelService {
     return { userResult, novelResult };
   }
 
+  // 유저 정보를 통한 상세 조회
   async findByIdWithUser(uid: number, token: string) {
     const user = await this.authService.validateToken(token);
     this.updateNovelView(uid);
@@ -105,13 +106,33 @@ export class NovelService {
     return { userResult, novelResult };
   }
 
+  // 특정 유저 피드 조회
   async findByUserFeedType(
     userId: number,
     { userFeedType, index, size }: FindNovelListUserDto,
   ) {
-    let novelList;
+    const novelList = await this.findUserFeed(
+      userFeedType,
+      index,
+      size,
+      userId,
+    );
+    const novelLikedList = await this.novelWithLikes(novelList);
+    return {
+      data: novelLikedList,
+      meta: await this.novelPaginationService.getMetadata(
+        index,
+        size,
+        null, // null 처리해주기
+        null, // null 처리해주기
+        userId,
+      ),
+    };
+  }
+
+  async findUserFeed(userFeedType, index, size, userId) {
     if (userFeedType === UserFeedType.USER_LIKED) {
-      novelList = await prisma.novel.findMany({
+      return await prisma.novel.findMany({
         include: {
           novel_likes: true,
         },
@@ -129,7 +150,7 @@ export class NovelService {
         take: size,
       });
     } else {
-      novelList = await prisma.novel.findMany({
+      return await prisma.novel.findMany({
         where: {
           user_uid: userId,
         },
@@ -140,24 +161,6 @@ export class NovelService {
         take: size,
       });
     }
-
-    const novelLikedList = novelList.map((novel) => {
-      return {
-        ...novel,
-        novel_likes: novel.novel_likes?.length ?? 0,
-      };
-    });
-
-    return {
-      data: novelLikedList,
-      meta: await this.novelPaginationService.getMetadata(
-        index,
-        size,
-        null,
-        null,
-        userId,
-      ),
-    };
   }
 
   async createNovel(
@@ -219,9 +222,10 @@ export class NovelService {
     });
   }
 
-  // --------------------분리한 함수 로직들--------------------------------------
+  // --------------------------------------분리한 함수 로직들--------------------------------------
 
   async updateNovelView(uid) {
+    // 소설 조회수 증가 함수
     return await prisma.novel.update({
       where: {
         uid,
@@ -234,6 +238,7 @@ export class NovelService {
     });
   }
   async findNovelDetailById(uid) {
+    // 소설 세부 조회 함수
     return await prisma.novel.findMany({
       where: {
         uid,
@@ -249,20 +254,22 @@ export class NovelService {
   }
 
   async novelWithLikes(novel, user = null) {
+    // 소설 좋아요 카운트 + 좋아요 여부 판단 함수
     if (user === null) {
       return novel.map((novel) => ({
         ...novel,
-        likeCount: novel.novel_likes.length, // 비로그인 시 좋아요 count만
+        likeCount: novel.novel_likes?.length ?? 0, // 비로그인 시 좋아요 count만
       }));
     }
     return novel.map((novel) => ({
       ...novel,
       like: novel.novel_likes.some((like) => like.user_uid === user.uid), // 로그인 시 count + 좋아요 여부도
-      likeCount: novel.novel_likes.length,
+      likeCount: novel.novel_likes?.length ?? 0,
     }));
   }
 
   async findUserNickname(uid) {
+    // 유저 닉네임 조회 함수
     return await prisma.user.findUnique({
       select: {
         nickname: true,
