@@ -20,7 +20,7 @@ import {
   SearchNovelListDto,
   FindNovelListUserDto,
 } from '@/novel/dto';
-import { Novel, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '@/user/get-user.decorator';
 import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';

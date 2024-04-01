@@ -82,16 +82,16 @@ export class NovelService {
     };
   }
 
-  async findById(id: number) {
+  async findById(uid: number) {
     const novel = await prisma.novel.findUnique({
       where: {
-        uid: id,
+        uid,
       },
     });
 
     await prisma.novel.update({
       where: {
-        uid: id,
+        uid,
       },
       data: {
         views: novel.views + 1,
@@ -99,7 +99,7 @@ export class NovelService {
       include: {
         novel_likes: {
           where: {
-            novel_uid: id,
+            novel_uid: uid,
           },
         },
       },
@@ -107,12 +107,12 @@ export class NovelService {
 
     const findNovel = await prisma.novel.findMany({
       where: {
-        uid: id,
+        uid,
       },
       include: {
         novel_likes: {
           where: {
-            novel_uid: id,
+            novel_uid: uid,
           },
         },
       },
@@ -208,7 +208,7 @@ export class NovelService {
         skip: (index - 1) * size,
         take: size,
       });
-    };
+    }
 
     const novelLikedList = novelList.map((novel) => {
       return {

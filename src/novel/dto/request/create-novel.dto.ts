@@ -1,5 +1,5 @@
 import { Category } from '@/novel/enums';
-import { IsEnum, IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
 class CreateNovelDto {
   @IsString()
