@@ -2,11 +2,11 @@ import * as dotenv from 'dotenv';
 import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { TokenPayload } from './tokenPayload.interface';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 
 dotenv.config();
-
 const prisma = new PrismaClient();
+type UserWithOutPwd = Omit<User, 'pwd'>;
 
 @Injectable()
 export class AuthService {
@@ -14,6 +14,7 @@ export class AuthService {
 
   public createToken(uid: number) {
     const payload: TokenPayload = { uid };
+
     return this.jwtService.sign(payload, {
       expiresIn: '12h',
       secret: process.env.SECRET_KEY,
@@ -26,15 +27,14 @@ export class AuthService {
       const verifiedToken: any = this.jwtService.verify(JWT, {
         secret: process.env.SECRET_KEY,
       });
+
       return await prisma.user.findUnique({
         select: { uid: true, id: true, nickname: true },
         where: { uid: verifiedToken.uid },
       });
     } catch (err) {
-      console.log(err);
       switch (err.message) {
-        case 'invalid token':
-        case 'NO_USER':
+        case 'invalid signature':
           throw new HttpException('유효하지 않은 토큰', 401);
 
         case 'jwt expired':
@@ -46,15 +46,42 @@ export class AuthService {
     }
   }
 
-  async validateTokenWithInfo(token: string) {
+  async validateTokenResponseWithInfo(token: string) {
     const targetUser = await this.validateToken(token);
+    const userInfo = await this.getUserInfo(targetUser);
+    const totalLikesCounts = await this.getTotalLikesCounts(targetUser);
+    const totalNovels = await this.getTotalNovels(targetUser);
+    const views = await this.getViews(targetUser);
 
-    const userInfo = await prisma.user.findUnique({
+    return { userInfo, totalLikesCounts, totalNovels, views };
+  }
+
+  async getUserInfo(targetUser): Promise<UserWithOutPwd> {
+    return await prisma.user.findUnique({
       select: { uid: true, id: true, nickname: true },
       where: { uid: targetUser.uid },
     });
+  }
 
+  async getTotalLikesCounts(targetUser) {
     const usersNovels = await prisma.novel.findMany({
+      where: { user_uid: targetUser.uid },
+      select: { uid: true },
+    });
+
+    const totalLikes = await Promise.all(
+      usersNovels.map(async (novel) => {
+        return await prisma.novel_Like.count({
+          where: { novel_uid: novel.uid },
+        });
+      }),
+    );
+
+    return totalLikes.reduce((acc, curr) => acc + curr, 0);
+  }
+
+  async getTotalNovels(targetUser) {
+    return await prisma.novel.findMany({
       where: {
         user_uid: targetUser.uid,
       },
@@ -62,36 +89,16 @@ export class AuthService {
         uid: true,
       },
     });
+  }
 
-    const totalLikes = usersNovels.map(async (novel) => {
-      return await prisma.novel_Like.count({
-        where: {
-          novel_uid: novel.uid,
-        },
-      });
-    });
-
-    let totalLikesCount = 0;
-
-    for (const e of totalLikes) {
-      totalLikesCount += await e;
-    }
-
-    const totalNovels = await prisma.novel.count({
-      where: {
-        user_uid: targetUser.uid,
-      },
-    });
+  async getViews(targetUser) {
     const {
       _sum: { views },
     } = await prisma.novel.aggregate({
-      _sum: {
-        views: true,
-      },
-      where: {
-        user_uid: targetUser.uid,
-      },
+      _sum: { views: true },
+      where: { user_uid: targetUser.uid },
     });
-    return { userInfo, totalLikesCount, totalNovels, views };
+
+    return views;
   }
 }

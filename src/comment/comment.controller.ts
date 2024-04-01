@@ -37,6 +37,7 @@ export class CommentController {
     @Headers('Authorization') token: string,
   ) {
     const user = await this.authService.validateToken(token);
+
     return this.commentService.create(createCommentDto, user.uid);
   }
 

@@ -22,12 +22,14 @@ export class ImageService {
   async generateImage(prompt: string) {
     const translateRes = await this.translationService.translate(prompt);
     const translatedPrompt = translateRes.data.translations[0].text;
+
     const response = await this.openai.images.generate({
       model: 'dall-e-2',
       prompt: translatedPrompt,
       n: 1,
       size: '512x512',
     });
+
     const imageUrl = response.data[0].url;
     const fileName = this.createFileName();
 

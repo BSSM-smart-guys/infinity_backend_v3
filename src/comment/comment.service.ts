@@ -8,6 +8,7 @@ const prisma = new PrismaClient();
 export class CommentService {
   async create(createCommentDto: CreateCommentDto, user_uid: any) {
     const { novel_uid, review } = createCommentDto;
+
     return await prisma.comment.create({
       data: {
         novel_uid,
