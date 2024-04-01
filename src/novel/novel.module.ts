@@ -4,7 +4,6 @@ import { NovelController } from './novel.controller';
 import { NovelPaginationService } from '@/novel/novel.pagination.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from '@/auth/auth.service';
-import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [NovelModule],

@@ -7,7 +7,7 @@ import {
   FindNovelListViewTypeDto,
   SearchNovelListDto,
 } from '@/novel/dto';
-import { Novel, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { UserFeedType, ViewType } from '@/novel/enums';
 import { NovelPaginationService } from '@/novel/novel.pagination.service';
 import CreateLikeDto from './dto/request/create-like-dto';
@@ -22,6 +22,7 @@ export class NovelService {
     private readonly authService: AuthService,
   ) {}
 
+  // 기본 조회
   async findByViewType({
     viewType,
     index,
@@ -37,6 +38,7 @@ export class NovelService {
     };
   }
 
+  // 카테고리별로 찾기
   async findByCategory({
     category,
     index,
@@ -58,6 +60,7 @@ export class NovelService {
     };
   }
 
+  // 검색
   async searchNovel({
     query,
     index,
@@ -82,105 +85,54 @@ export class NovelService {
     };
   }
 
-  async findById(id: number) {
-    const novel = await prisma.novel.findUnique({
-      where: {
-        uid: id,
-      },
-    });
+  // 상세 조회
+  async findById(uid: number) {
+    this.updateNovelView(uid); // view 수 올리기
+    const findNovel = await this.findNovelDetailById(uid); // 소설 상세 조회
+    const userResult = await this.findUserNickname(findNovel[0].user_uid); // 닉네임 가져오기
+    const novelResult = await this.novelWithLikes(findNovel);
 
-    await prisma.novel.update({
-      where: {
-        uid: id,
-      },
-      data: {
-        views: novel.views + 1,
-      },
-      include: {
-        novel_likes: {
-          where: {
-            novel_uid: id,
-          },
-        },
-      },
-    });
-
-    const findNovel = await prisma.novel.findMany({
-      where: {
-        uid: id,
-      },
-      include: {
-        novel_likes: {
-          where: {
-            novel_uid: id,
-          },
-        },
-      },
-    });
-
-    const userResult = await prisma.user.findUnique({
-      select: {
-        nickname: true,
-      },
-      where: {
-        uid: findNovel[0].user_uid,
-      },
-    });
-    const novelResult = findNovel.map((novel) => ({
-      ...novel,
-      likeCount: novel.novel_likes.length,
-    }));
     return { userResult, novelResult };
   }
 
+  // 유저 정보를 통한 상세 조회
   async findByIdWithUser(uid: number, token: string) {
     const user = await this.authService.validateToken(token);
-    const novelsWithUserLike = await prisma.novel.findMany({
-      where: {
-        uid: uid,
-      },
-      include: {
-        novel_likes: {
-          where: {
-            novel_uid: uid,
-          },
-        },
-      },
-    });
-
-    await prisma.novel.update({
-      where: {
-        uid,
-      },
-      data: {
-        views: novelsWithUserLike[0].views + 1,
-      },
-    });
-
-    const userResult = await prisma.user.findUnique({
-      select: {
-        nickname: true,
-      },
-      where: {
-        uid: novelsWithUserLike[0].user_uid,
-      },
-    });
-
-    const novelResult = novelsWithUserLike.map((novel) => ({
-      ...novel,
-      like: novel.novel_likes.some((like) => like.user_uid === user.uid),
-      likeCount: novel.novel_likes.length,
-    }));
+    this.updateNovelView(uid);
+    const userResult = await this.findUserNickname(user.uid);
+    const findNovel = await this.findNovelDetailById(uid);
+    const novelResult = await this.novelWithLikes(findNovel, user); // 좋아요 여부
 
     return { userResult, novelResult };
   }
+
+  // 특정 유저 피드 조회
   async findByUserFeedType(
     userId: number,
     { userFeedType, index, size }: FindNovelListUserDto,
   ) {
-    let novelList;
+    const novelList = await this.findUserFeed(
+      userFeedType,
+      index,
+      size,
+      userId,
+    );
+    const novelLikedList = await this.novelWithLikes(novelList);
+    return {
+      data: novelLikedList,
+      meta: await this.novelPaginationService.getMetadata(
+        index,
+        size,
+        null, // null 처리해주기
+        null, // null 처리해주기
+        userId,
+      ),
+    };
+  }
+
+  async findUserFeed(userFeedType, index, size, userId) {
     if (userFeedType === UserFeedType.USER_LIKED) {
-      novelList = await prisma.novel.findMany({
+      return await prisma.novel.findMany({
         include: {
           novel_likes: true,
         },
@@ -198,7 +150,7 @@ export class NovelService {
         take: size,
       });
     } else {
-      novelList = await prisma.novel.findMany({
+      return await prisma.novel.findMany({
         where: {
           user_uid: userId,
         },
@@ -208,25 +160,7 @@ export class NovelService {
         skip: (index - 1) * size,
         take: size,
       });
-    };
-
-    const novelLikedList = novelList.map((novel) => {
-      return {
-        ...novel,
-        novel_likes: novel.novel_likes?.length ?? 0,
-      };
-    });
-
-    return {
-      data: novelLikedList,
-      meta: await this.novelPaginationService.getMetadata(
-        index,
-        size,
-        null,
-        null,
-        userId,
-      ),
-    };
+    }
   }
 
   async createNovel(
@@ -272,7 +206,6 @@ export class NovelService {
         novel_uid,
       },
     });
-
     if (likeCheck.length == 0) {
       return await prisma.novel_Like.create({
         data: { novel_uid, user_uid },
@@ -284,6 +217,64 @@ export class NovelService {
           user_uid,
           novel_uid,
         },
+      },
+    });
+  }
+
+  // --------------------------------------분리한 함수 로직들--------------------------------------
+
+  async updateNovelView(uid) {
+    // 소설 조회수 증가 함수
+    return await prisma.novel.update({
+      where: {
+        uid,
+      },
+      data: {
+        views: {
+          increment: 1,
+        },
+      },
+    });
+  }
+  async findNovelDetailById(uid) {
+    // 소설 세부 조회 함수
+    return await prisma.novel.findMany({
+      where: {
+        uid,
+      },
+      include: {
+        novel_likes: {
+          where: {
+            novel_uid: uid,
+          },
+        },
+      },
+    });
+  }
+
+  async novelWithLikes(novel, user = null) {
+    // 소설 좋아요 카운트 + 좋아요 여부 판단 함수
+    if (user === null) {
+      return novel.map((novel) => ({
+        ...novel,
+        likeCount: novel.novel_likes?.length ?? 0, // 비로그인 시 좋아요 count만
+      }));
+    }
+    return novel.map((novel) => ({
+      ...novel,
+      like: novel.novel_likes.some((like) => like.user_uid === user.uid), // 로그인 시 count + 좋아요 여부도
+      likeCount: novel.novel_likes?.length ?? 0,
+    }));
+  }
+
+  async findUserNickname(uid) {
+    // 유저 닉네임 조회 함수
+    return await prisma.user.findUnique({
+      select: {
+        nickname: true,
+      },
+      where: {
+        uid,
       },
     });
   }
