@@ -7,7 +7,7 @@ import {
   FindNovelListViewTypeDto,
   SearchNovelListDto,
 } from '@/novel/dto';
-import { Novel, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { UserFeedType, ViewType } from '@/novel/enums';
 import { NovelPaginationService } from '@/novel/novel.pagination.service';
 import CreateLikeDto from './dto/request/create-like-dto';
@@ -206,7 +206,6 @@ export class NovelService {
         novel_uid,
       },
     });
-
     if (likeCheck.length == 0) {
       return await prisma.novel_Like.create({
         data: { novel_uid, user_uid },
