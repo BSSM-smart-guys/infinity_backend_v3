@@ -26,7 +26,7 @@ export class CommentController {
   @ApiOperation({ summary: '게시판 내 댓글 가져오기' })
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.commentService.findOne(+id);
+    return this.commentService.findComments(+id);
   }
 
   @ApiOperation({ summary: '댓글 작성하기' })
