@@ -18,7 +18,7 @@ export class CommentService {
     });
   }
 
-  async findOne(novel_uid: number) {
+  async findComments(novel_uid: number) {
     return await prisma.comment.findMany({
       include: {
         user: {

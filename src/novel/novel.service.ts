@@ -130,37 +130,24 @@ export class NovelService {
     };
   }
 
-  async findUserFeed(userFeedType, index, size, userId) {
+  // 유저피드 찾기
+  async findUserFeed(userFeedType, index, size, user_uid) {
+    const defaultQuery = {
+      // 기본 쿼리
+      orderBy: { uid: 'desc' },
+      skip: (index - 1) * size,
+      take: size,
+    };
+
     if (userFeedType === UserFeedType.USER_LIKED) {
-      return await prisma.novel.findMany({
-        include: {
-          novel_likes: true,
-        },
-        where: {
-          novel_likes: {
-            some: {
-              user_uid: userId,
-            },
-          },
-        },
-        orderBy: {
-          uid: 'desc',
-        },
-        skip: (index - 1) * size,
-        take: size,
+      Object.assign(defaultQuery, {
+        include: { novel_likes: true },
+        where: { novel_likes: { some: { user_uid } } },
       });
     } else {
-      return await prisma.novel.findMany({
-        where: {
-          user_uid: userId,
-        },
-        orderBy: {
-          uid: 'desc',
-        },
-        skip: (index - 1) * size,
-        take: size,
-      });
+      Object.assign(defaultQuery, { where: { user_uid } });
     }
+    return await prisma.novel.findMany(Object.assign(defaultQuery));
   }
 
   async createNovel(

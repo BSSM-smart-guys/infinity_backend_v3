@@ -1,6 +1,6 @@
+import config from '@/config';
 import { Injectable } from '@nestjs/common';
 import { OpenAI } from 'openai';
-import config from '@/config';
 import * as fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';

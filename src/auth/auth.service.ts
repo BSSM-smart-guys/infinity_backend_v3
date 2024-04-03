@@ -1,13 +1,12 @@
-import * as dotenv from 'dotenv';
+import config from '@/config';
 import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { TokenPayload } from './tokenPayload.interface';
+import { TokenPayload } from './payload/tokenPayload.interface';
 import { PrismaClient, User } from '@prisma/client';
 
-dotenv.config();
 const prisma = new PrismaClient();
 type UserWithOutPwd = Omit<User, 'pwd'>;
-
+const secret = config().secret.key;
 @Injectable()
 export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
@@ -17,15 +16,15 @@ export class AuthService {
 
     return this.jwtService.sign(payload, {
       expiresIn: '12h',
-      secret: process.env.SECRET_KEY,
+      secret,
     });
   }
 
   public async validateToken(token: string) {
     try {
-      const [Bearer, JWT] = token.split(' ');
+      const JWT = token.replace('Bearer ', '');
       const verifiedToken: any = this.jwtService.verify(JWT, {
-        secret: process.env.SECRET_KEY,
+        secret,
       });
 
       return await prisma.user.findUnique({

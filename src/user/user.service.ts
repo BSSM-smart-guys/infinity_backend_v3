@@ -22,7 +22,7 @@ export class UserService {
       where: { OR: [{ id }, { nickname }] }, // id, nickname 중 중복되는 것 찾기
     });
 
-    if (duplicate.length != 0) throw new ConflictException(); // 중복되면 conflict
+    if (duplicate.length != 0) throw new ConflictException();
 
     const pwd = await bcrypt.hash(createUserDto.pwd, saltrounds);
     await prisma.user.create({

@@ -13,4 +13,7 @@ export default () => ({
     key: process.env.DEEPLE_API_KEY,
     url: process.env.DEEPLE_API_URL,
   },
+  secret: {
+    key: process.env.SECRET_KEY,
+  },
 });
