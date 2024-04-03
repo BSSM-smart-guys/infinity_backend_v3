@@ -87,7 +87,7 @@ export class NovelService {
 
   // 상세 조회
   async findById(uid: number) {
-    this.updateNovelView(uid); // view 수 올리기
+    await this.updateNovelView(uid); // view 수 올리기
     const findNovel = await this.findNovelDetailById(uid); // 소설 상세 조회
     const userResult = await this.findUserNickname(findNovel[0].user_uid); // 닉네임 가져오기
     const novelResult = await this.novelWithLikes(findNovel);
@@ -98,7 +98,7 @@ export class NovelService {
   // 유저 정보를 통한 상세 조회
   async findByIdWithUser(uid: number, token: string) {
     const user = await this.authService.validateToken(token);
-    this.updateNovelView(uid);
+    await this.updateNovelView(uid);
     const userResult = await this.findUserNickname(user.uid);
     const findNovel = await this.findNovelDetailById(uid);
     const novelResult = await this.novelWithLikes(findNovel, user); // 좋아요 여부
