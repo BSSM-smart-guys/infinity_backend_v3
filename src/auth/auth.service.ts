@@ -22,7 +22,7 @@ export class AuthService {
 
   public async validateToken(token: string) {
     try {
-      const [Bearer, JWT] = token.split(' ');
+      const JWT = token.replace('Bearer ', '');
       const verifiedToken: any = this.jwtService.verify(JWT, {
         secret,
       });
