@@ -28,7 +28,7 @@ export class NovelPaginationService {
     return Math.ceil(total / size);
   }
 
-  async getNovelCount(where: object) {
+  async getNovelCount(where: PrismaWhereType) {
     return prisma.novel.count({
       where,
     });
