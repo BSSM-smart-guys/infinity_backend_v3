@@ -52,11 +52,9 @@ export class NovelService {
         skip: (index - 1) * size,
         take: size,
       }),
-      meta: await this.novelPaginationService.getMetadata(
-        index,
-        size,
+      meta: await this.novelPaginationService.getMetadata(index, size, {
         category,
-      ),
+      }),
     };
   }
 
@@ -76,12 +74,11 @@ export class NovelService {
         },
         orderBy: this.orderByViewType(viewType),
       }),
-      meta: await this.novelPaginationService.getMetadata(
-        index,
-        size,
-        null,
-        query,
-      ),
+      meta: await this.novelPaginationService.getMetadata(index, size, {
+        title: {
+          contains: query,
+        },
+      }),
     };
   }
 
@@ -120,13 +117,9 @@ export class NovelService {
     const novelLikedList = await this.novelWithLikes(novelList);
     return {
       data: novelLikedList,
-      meta: await this.novelPaginationService.getMetadata(
-        index,
-        size,
-        null, // null 처리해주기
-        null, // null 처리해주기
-        userId,
-      ),
+      meta: await this.novelPaginationService.getMetadata(index, size, {
+        uid: userId,
+      }),
     };
   }
 
