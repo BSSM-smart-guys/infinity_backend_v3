@@ -1,33 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { PaginationMetaDto } from '@/novel/dto';
-import { Category } from '@/novel/enums';
 
 const prisma = new PrismaClient();
+
+type PrismaWhereType = object & Prisma.NovelWhereInput;
 
 @Injectable()
 export class NovelPaginationService {
   async getMetadata(
     index: number,
     size: number,
-    category?: Category,
-    query?: string,
-    userId?: number,
+    where?: PrismaWhereType,
   ): Promise<PaginationMetaDto> {
-    const total: number = await prisma.novel.count({
-      where: {
-        ...(category && { category }),
-        ...(query && {
-          title: {
-            contains: query,
-          },
-        }),
-        ...(userId && {
-          uid: userId,
-        }),
-      },
-    });
-    const lastPage: number = Math.ceil(total / size);
+    const total: number = await this.getNovelCount(where && { ...where });
+    const lastPage: number = this.getLastPage(total, size);
 
     return {
       total,
@@ -35,5 +22,15 @@ export class NovelPaginationService {
       currentPage: index,
       size,
     };
+  }
+
+  getLastPage(total: number, size: number) {
+    return Math.ceil(total / size);
+  }
+
+  async getNovelCount(where: PrismaWhereType) {
+    return prisma.novel.count({
+      where,
+    });
   }
 }
