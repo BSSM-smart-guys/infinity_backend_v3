@@ -83,22 +83,18 @@ export class NovelService {
   }
 
   // 상세 조회
-  async findById(uid: number) {
+  async findById(uid: number, token: string) {
+    let user: any; // 나중에 타입 만들기
+    let novelResult: any;
+
     await this.updateNovelView(uid); // view 수 올리기
-    const findNovel = await this.findNovelDetailById(uid); // 소설 상세 조회
-    const userResult = await this.findUserNickname(findNovel[0].user_uid); // 닉네임 가져오기
-    const novelResult = await this.novelWithLikes(findNovel);
-
-    return { userResult, novelResult };
-  }
-
-  // 유저 정보를 통한 상세 조회
-  async findByIdWithUser(uid: number, token: string) {
-    const user = await this.authService.validateToken(token);
-    await this.updateNovelView(uid);
-    const userResult = await this.findUserNickname(user.uid);
     const findNovel = await this.findNovelDetailById(uid);
-    const novelResult = await this.novelWithLikes(findNovel, user); // 좋아요 여부
+    const userResult = await this.findUserNickname(findNovel[0].user_uid);
+
+    if (token !== null) {
+      user = await this.authService.validateToken(token);
+      novelResult = await this.novelWithLikes(findNovel, user);
+    } else novelResult = await this.novelWithLikes(findNovel);
 
     return { userResult, novelResult };
   }
