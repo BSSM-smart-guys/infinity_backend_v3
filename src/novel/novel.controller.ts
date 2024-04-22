@@ -103,17 +103,11 @@ export class NovelController {
 
   @Get(':id')
   @ApiOperation({ summary: '소설 상세 조회' })
-  findById(@Param('id', new ParseIntPipe()) id: number): Promise<any> {
-    return this.novelService.findById(id);
-  }
-
-  @Get('/loggedin/:id')
-  @ApiOperation({ summary: '로그인된 유저용 소설 상세 조회' })
-  findByIdWithUser(
+  findById(
     @Param('id', new ParseIntPipe()) id: number,
-    @Headers('Authorization') token: string,
-  ) {
-    return this.novelService.findByIdWithUser(id, token);
+    @Headers('Authorization') token: string = null,
+  ): Promise<any> {
+    return this.novelService.findById(id, token);
   }
 
   @Get('user/:userId')
