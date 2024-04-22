@@ -7,12 +7,13 @@ import {
   FindNovelListViewTypeDto,
   SearchNovelListDto,
 } from '@/novel/dto';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 import { UserFeedType, ViewType } from '@/novel/enums';
 import { NovelPaginationService } from '@/novel/novel.pagination.service';
 import CreateLikeDto from './dto/request/create-like-dto';
 import { AuthService } from '@/auth/auth.service';
 
+type UserInfo = Omit<User, 'pwd'>;
 const prisma = new PrismaClient();
 
 @Injectable()
@@ -84,7 +85,7 @@ export class NovelService {
 
   // 상세 조회
   async findById(uid: number, token: string) {
-    let user: any; // 나중에 타입 만들기
+    let user: UserInfo;
     let novelResult: any;
 
     await this.updateNovelView(uid); // view 수 올리기
@@ -120,9 +121,13 @@ export class NovelService {
   }
 
   // 유저피드 찾기
-  async findUserFeed(userFeedType, index, size, user_uid) {
+  async findUserFeed(
+    userFeedType: string,
+    index: number,
+    size: number,
+    user_uid: number,
+  ) {
     const defaultQuery = {
-      // 기본 쿼리
       orderBy: { uid: 'desc' },
       skip: (index - 1) * size,
       take: size,

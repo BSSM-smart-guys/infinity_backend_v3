@@ -10,7 +10,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
-import { CreateCommentDto } from './dto/create-comment.dto';
+import { CreateCommentDto } from './dto/request/create-comment.dto';
 import { AuthService } from '@/auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';

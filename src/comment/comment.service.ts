@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateCommentDto } from './dto/create-comment.dto';
+import { CreateCommentDto } from './dto/request/create-comment.dto';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
