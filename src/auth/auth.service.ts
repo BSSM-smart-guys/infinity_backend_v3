@@ -32,6 +32,7 @@ export class AuthService {
         where: { uid: verifiedToken.uid },
       });
     } catch (err) {
+      console.log(err);
       switch (err.message) {
         case 'invalid signature':
           throw new HttpException('유효하지 않은 토큰', 401);
