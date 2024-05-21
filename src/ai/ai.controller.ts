@@ -1,8 +1,10 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { AiService } from './ai.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { KeywordDto } from './dto/keywordDto';
+import { Throttle } from '@nestjs/throttler';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('AI')
 @Controller('/ai')
@@ -10,8 +12,10 @@ export class AiController {
   constructor(private readonly aiService: AiService) {}
 
   @ApiOperation({ summary: '소설 작성 API' })
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @UseGuards(AuthGuard('jwt'))
   @Post()
-  async getAIResponse(@Body() body: any, @Res() res: Response) {
+  async getAIResponse(@Body() body, @Res() res: Response) {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');

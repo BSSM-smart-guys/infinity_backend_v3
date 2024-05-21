@@ -26,8 +26,10 @@ import { GetUser } from '@/user/get-user.decorator';
 import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import CreateLikeDto from './dto/request/create-like-dto';
 import { Category, UserFeedType, ViewType } from '@/novel/enums';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @ApiTags('Novel')
+@SkipThrottle()
 @Controller('novel')
 export class NovelController {
   constructor(private readonly novelService: NovelService) {}

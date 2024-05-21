@@ -14,8 +14,10 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { AuthService } from '@/auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @ApiTags('Comment')
+@SkipThrottle()
 @Controller('comment')
 export class CommentController {
   constructor(
