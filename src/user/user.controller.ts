@@ -17,8 +17,10 @@ import { AuthService } from '@/auth/auth.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @ApiTags('User')
+@SkipThrottle()
 @Controller('user')
 export class UserController {
   constructor(
