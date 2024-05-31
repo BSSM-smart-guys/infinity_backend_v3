@@ -11,13 +11,14 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { LoginUserDto } from './dto/login-user-dto';
+import { CreateUserDto } from './dto/request/create-user.dto';
+import { LoginUserDto } from './dto/request/login-user-dto';
 import { AuthService } from '@/auth/auth.service';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserDto } from './dto/request/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
+import { TokenResponseDto } from './dto/response/token-response.dto';
 
 @ApiTags('User')
 @SkipThrottle()
@@ -49,22 +50,20 @@ export class UserController {
   @ApiOperation({ summary: '유저 로그인 API' })
   @HttpCode(200)
   @Post('/login')
-  async login(@Body() loginUserDto: LoginUserDto) {
+  async login(@Body() loginUserDto: LoginUserDto): Promise<TokenResponseDto> {
     const authorize = await this.userService.login(loginUserDto);
     const token = this.authService.createToken(authorize);
-    return { token };
+    return TokenResponseDto.of(token);
   }
 
   @ApiOperation({ summary: '유저 정보 수정 API' })
   @Put(':uid')
   @UseGuards(AuthGuard('jwt'))
-  update(@Param('uid') uid: string, @Body() updateUserDto: UpdateUserDto) {
+  update(
+    @Param('uid') uid: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): HttpStatus {
     this.userService.update(+uid, updateUserDto);
     return HttpStatus.OK;
   }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {   // 프론트랑 상의 후 개발
-  //   return this.userService.remove(+id);
-  // }
 }

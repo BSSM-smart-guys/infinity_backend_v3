@@ -11,7 +11,7 @@ const secret = config().secret.key;
 export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
-  public createToken(uid: number) {
+  public createToken(uid: number): string {
     const payload: TokenPayload = { uid };
 
     return this.jwtService.sign(payload, {
