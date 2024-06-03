@@ -19,6 +19,11 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import { TokenResponseDto } from './dto/response/token-response.dto';
+import { ValidateTokenResponseDto } from './dto/response/validate-token-response.dto';
+import { User } from '@prisma/client';
+import { userInfoDto } from './dto/response/userInfo-dto';
+
+type UserWithOutPwd = Omit<User, 'pwd'>;
 
 @ApiTags('User')
 @SkipThrottle()
@@ -31,19 +36,23 @@ export class UserController {
 
   @ApiOperation({ summary: '유저 정보 + 각종 정보 by JWT API' })
   @Get('/')
-  findByJWT(@Headers('Authorization') token: string) {
+  findByJWT(
+    @Headers('Authorization') token: string,
+  ): Promise<ValidateTokenResponseDto> {
     return this.authService.validateTokenResponseWithInfo(token);
   }
 
   @ApiOperation({ summary: '유저 정보 by JWT API' })
   @Get('/onlyuser')
-  findJustUserByJWT(@Headers('Authorization') token: string) {
+  findJustUserByJWT(
+    @Headers('Authorization') token: string,
+  ): Promise<UserWithOutPwd> {
     return this.authService.validateToken(token);
   }
 
   @ApiOperation({ summary: '유저 회원가입 API' })
   @Post('/signup')
-  create(@Body() createUserDto: CreateUserDto) {
+  create(@Body() createUserDto: CreateUserDto): Promise<userInfoDto> {
     return this.userService.create(createUserDto);
   }
 

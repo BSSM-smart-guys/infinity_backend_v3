@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/request/create-user.dto';
 import { UpdateUserDto } from './dto/request/update-user.dto';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from './dto/request/login-user-dto';
 
@@ -14,12 +14,12 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class UserService {
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto): Promise<CreateUserDto> {
     const { id, nickname } = createUserDto;
     const saltrounds = 10;
 
     const duplicate = await prisma.user.findMany({
-      where: { OR: [{ id }, { nickname }] }, // id, nickname 중 중복되는 것 찾기
+      where: { OR: [{ id }, { nickname }] },
     });
 
     if (duplicate.length != 0) throw new ConflictException();
@@ -32,7 +32,7 @@ export class UserService {
     return createUserDto;
   }
 
-  async login(loginUserDto: LoginUserDto) {
+  async login(loginUserDto: LoginUserDto): Promise<number> {
     const { id, pwd } = loginUserDto;
 
     const userInfo = await prisma.user.findMany({ where: { id } });
@@ -45,14 +45,14 @@ export class UserService {
     throw new UnauthorizedException();
   }
 
-  async findOne(uid: number) {
+  async findOne(uid: number): Promise<User> {
     const userInfo = await prisma.user.findUnique({
       select: { id: true, nickname: true },
       where: { uid },
     });
     if (!userInfo) throw new NotFoundException();
 
-    return userInfo;
+    return userInfo as User;
   }
 
   async update(uid: number, updateUserDto: UpdateUserDto) {

@@ -119,7 +119,12 @@ export class NovelService {
   }
 
   // 유저피드 찾기
-  async findUserFeed(userFeedType, index, size, user_uid) {
+  async findUserFeed(
+    userFeedType: UserFeedType,
+    index: number,
+    size: number,
+    user_uid: number,
+  ) {
     const defaultQuery = {
       // 기본 쿼리
       orderBy: { uid: 'desc' },
