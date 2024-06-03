@@ -2,7 +2,7 @@ import config from '@/config';
 import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { TokenPayload } from './payload/tokenPayload.interface';
-import { PrismaClient, User } from '@prisma/client';
+import { Novel, PrismaClient, User } from '@prisma/client';
 
 const prisma = new PrismaClient();
 type UserWithOutPwd = Omit<User, 'pwd'>;
@@ -20,19 +20,18 @@ export class AuthService {
     });
   }
 
-  public async validateToken(token: string) {
+  public async validateToken(token: string): Promise<User> {
     try {
       const JWT = token.replace('Bearer ', '');
       const verifiedToken: any = this.jwtService.verify(JWT, {
         secret,
       });
 
-      return await prisma.user.findUnique({
+      return (await prisma.user.findUnique({
         select: { uid: true, id: true, nickname: true },
         where: { uid: verifiedToken.uid },
-      });
+      })) as User;
     } catch (err) {
-      console.log(err);
       switch (err.message) {
         case 'invalid signature':
           throw new HttpException('유효하지 않은 토큰', 401);
@@ -56,14 +55,14 @@ export class AuthService {
     return { userInfo, totalLikesCounts, totalNovels, views };
   }
 
-  async getUserInfo(targetUser): Promise<UserWithOutPwd> {
+  async getUserInfo(targetUser: User): Promise<UserWithOutPwd> {
     return await prisma.user.findUnique({
       select: { uid: true, id: true, nickname: true },
       where: { uid: targetUser.uid },
     });
   }
 
-  async getTotalLikesCounts(targetUser) {
+  async getTotalLikesCounts(targetUser: User): Promise<number> {
     const usersNovels = await prisma.novel.findMany({
       where: { user_uid: targetUser.uid },
       select: { uid: true },
@@ -80,7 +79,7 @@ export class AuthService {
     return totalLikes.reduce((acc, curr) => acc + curr, 0);
   }
 
-  async getTotalNovels(targetUser) {
+  async getTotalNovels(targetUser: User): Promise<{ uid: number }[]> {
     return await prisma.novel.findMany({
       where: {
         user_uid: targetUser.uid,
@@ -91,7 +90,7 @@ export class AuthService {
     });
   }
 
-  async getViews(targetUser) {
+  async getViews(targetUser: User) {
     const {
       _sum: { views },
     } = await prisma.novel.aggregate({
