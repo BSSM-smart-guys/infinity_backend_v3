@@ -3,6 +3,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { TokenPayload } from './payload/tokenPayload.interface';
 import { PrismaClient, User } from '@prisma/client';
+import { ValidateTokenResponseDto } from '@/user/dto/response/validate-token-response.dto';
 
 const prisma = new PrismaClient();
 type UserWithOutPwd = Omit<User, 'pwd'>;
@@ -11,7 +12,7 @@ const secret = config().secret.key;
 export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
-  public createToken(uid: number) {
+  public createToken(uid: number): string {
     const payload: TokenPayload = { uid };
 
     return this.jwtService.sign(payload, {
@@ -20,7 +21,7 @@ export class AuthService {
     });
   }
 
-  public async validateToken(token: string) {
+  public async validateToken(token: string): Promise<UserWithOutPwd> {
     try {
       const JWT = token.replace('Bearer ', '');
       const verifiedToken: any = this.jwtService.verify(JWT, {
@@ -32,7 +33,6 @@ export class AuthService {
         where: { uid: verifiedToken.uid },
       });
     } catch (err) {
-      console.log(err);
       switch (err.message) {
         case 'invalid signature':
           throw new HttpException('유효하지 않은 토큰', 401);
@@ -46,24 +46,31 @@ export class AuthService {
     }
   }
 
-  async validateTokenResponseWithInfo(token: string) {
-    const targetUser = await this.validateToken(token);
-    const userInfo = await this.getUserInfo(targetUser);
-    const totalLikesCounts = await this.getTotalLikesCounts(targetUser);
+  async validateTokenResponseWithInfo(
+    token: string,
+  ): Promise<ValidateTokenResponseDto> {
+    const targetUser: UserWithOutPwd = await this.validateToken(token);
+    const userInfo: UserWithOutPwd = await this.getUserInfo(targetUser);
+    const totalLikesCounts: number = await this.getTotalLikesCounts(targetUser);
     const totalNovels = await this.getTotalNovels(targetUser);
-    const views = await this.getViews(targetUser);
+    const views: number = await this.getViews(targetUser);
 
-    return { userInfo, totalLikesCounts, totalNovels, views };
+    return ValidateTokenResponseDto.from(
+      userInfo,
+      totalLikesCounts,
+      totalNovels,
+      views,
+    );
   }
 
-  async getUserInfo(targetUser): Promise<UserWithOutPwd> {
+  async getUserInfo(targetUser: UserWithOutPwd): Promise<UserWithOutPwd> {
     return await prisma.user.findUnique({
       select: { uid: true, id: true, nickname: true },
       where: { uid: targetUser.uid },
     });
   }
 
-  async getTotalLikesCounts(targetUser) {
+  async getTotalLikesCounts(targetUser: UserWithOutPwd): Promise<number> {
     const usersNovels = await prisma.novel.findMany({
       where: { user_uid: targetUser.uid },
       select: { uid: true },
@@ -80,7 +87,7 @@ export class AuthService {
     return totalLikes.reduce((acc, curr) => acc + curr, 0);
   }
 
-  async getTotalNovels(targetUser) {
+  async getTotalNovels(targetUser: UserWithOutPwd): Promise<{ uid: number }[]> {
     return await prisma.novel.findMany({
       where: {
         user_uid: targetUser.uid,
@@ -91,7 +98,7 @@ export class AuthService {
     });
   }
 
-  async getViews(targetUser) {
+  async getViews(targetUser: UserWithOutPwd): Promise<number> {
     const {
       _sum: { views },
     } = await prisma.novel.aggregate({
